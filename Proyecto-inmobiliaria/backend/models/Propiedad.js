@@ -14,7 +14,7 @@ const propiedadSchema = new mongoose.Schema({
     },
     comuna: { type: String, required: true },
     direccion: { type: String, required: true },
-    superficie: { type: Number, required: true },6
+    superficie: { type: Number, required: true },
     dormitorios: { type: Number, default: 0 },
     banos: { type: Number, default: 0 },
     estacionamientos: { type: Number, default: 0 },
