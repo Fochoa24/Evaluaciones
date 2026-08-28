@@ -247,6 +247,233 @@ footer {
     text-align: center;
 }
 
+
+/* Pagina Login */
+
+.login-contenedor {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    min-height: calc(100vh - 140px); 
+    padding: 40px 20px;
+}
+
+.tarjeta-login {
+    background-color: var(--blanco);
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(18, 60, 54, 0.12);
+    max-width: 420px;
+    padding: 40px 30px;
+    width: 100%;
+}
+
+.tarjeta-login h2 {
+    color: var(--verde-oscuro);
+    font-family: Georgia, serif;
+    font-size: 1.8rem;
+    margin-bottom: 8px;
+    text-align: center;
+}
+
+.subtitulo-login {
+    color: var(--gris);
+    font-size: 0.95rem;
+    margin-bottom: 28px;
+    text-align: center;
+}
+
+.formulario-login {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.campo {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.campo label {
+    color: var(--texto);
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+.campo input,
+.campo select {
+    border: 1.5px solid #d0d7d5;
+    border-radius: 6px;
+    color: var(--texto);
+    font-size: 1rem;
+    padding: 12px 14px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    width: 100%;
+}
+
+.campo input:focus,
+.campo select:focus {
+    border-color: var(--verde);
+    box-shadow: 0 0 0 3px rgba(36, 113, 93, 0.15);
+    outline: none;
+}
+
+.boton-login {
+    cursor: pointer;
+    font-size: 1rem;
+    margin-top: 10px;
+    text-align: center;
+    width: 100%;
+}
+
+/* Propiedades */
+
+.encabezado-catalogo {
+    margin-bottom: 30px;
+}
+
+.contenedor-filtros {
+    background: var(--blanco);
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    margin-bottom: 40px;
+    padding: 24px;
+}
+
+.bar-filtros {
+    align-items: flex-end;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.grupo-filtro {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 160px;
+}
+
+.grupo-filtro label {
+    color: var(--texto);
+    font-size: 0.85rem;
+    font-weight: bold;
+}
+
+.grupo-filtro input,
+.grupo-filtro select {
+    border: 1px solid #d0d7d5;
+    border-radius: 6px;
+    padding: 10px;
+}
+
+.boton-filtrar {
+    cursor: pointer;
+    padding: 11px 20px;
+}
+
+/* Grilla de Tarjetas */
+
+.propiedades-grilla {
+    display: grid;
+    gap: 30px;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+}
+
+.tarjeta-propiedad {
+    background: var(--blanco);
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(18, 60, 54, 0.08);
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.tarjeta-propiedad:hover {
+    box-shadow: 0 12px 28px rgba(18, 60, 54, 0.15);
+    transform: translateY(-5px);
+}
+
+.imagen-contenedor {
+    height: 200px;
+    position: relative;
+    width: 100%;
+}
+
+.imagen-contenedor img {
+    height: 100%;
+    object-fit: cover;
+    width: 100%;
+}
+
+.insignia-estado {
+    background: var(--verde);
+    border-radius: 4px;
+    color: var(--blanco);
+    font-size: 0.75rem;
+    font-weight: bold;
+    padding: 4px 8px;
+    position: absolute;
+    right: 12px;
+    top: 12px;
+}
+
+.info-propiedad {
+    padding: 20px;
+}
+
+.tipo-propiedad {
+    color: var(--verde);
+    font-size: 0.8rem;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.info-propiedad h3 {
+    color: var(--verde-oscuro);
+    font-size: 1.15rem;
+    margin: 6px 0 4px;
+}
+
+.ubicacion {
+    color: var(--gris);
+    font-size: 0.9rem;
+    margin-bottom: 14px;
+}
+
+.detalles-tecnicos {
+    border-bottom: 1px solid #eee;
+    border-top: 1px solid #eee;
+    display: flex;
+    gap: 14px;
+    padding: 10px 0;
+}
+
+.detalles-tecnicos span {
+    color: var(--texto);
+    font-size: 0.85rem;
+}
+
+.precio-accion {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    margin-top: 16px;
+}
+
+.precio {
+    color: var(--verde-oscuro);
+    font-size: 1.15rem;
+    font-weight: bold;
+}
+
+.boton-ver {
+    border-radius: 4px;
+    font-size: 0.85rem;
+    padding: 8px 14px;
+}
+
+
 /* Animaciones */
 
 

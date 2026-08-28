@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../css/styles.css">
+    <title>Propiedades - Gestión Urbana</title>
+</head>
+<body class="body">
+    <header class="encabezado">
+        <a class="logo" href="../index.html">Gestión Urbana</a>
+        <nav>
+            <a href="../index.html">Inicio</a>
+            <a href="./propiedades.html">Propiedades</a>
+            <a href="./login.html">Iniciar Sesión</a>
+        </nav>
+    </header>
+    
+    <main class="seccion">
+        <section class="encabezado-catalogo">
+            <p class="etiqueta">CATÁLOGO DE INMUEBLES</p>
+            <h1>Explora nuestras propiedades disponibles</h1>
+        </section>
+
+        <!-- Barra de Filtros (RF5) -->
+        <section class="contenedor-filtros">
+            <form id="form-filtros" class="bar-filtros">
+                <div class="grupo-filtro">
+                    <label for="filtro-tipo">Tipo</label>
+                    <select id="filtro-tipo" name="tipo">
+                        <option value="">Todos</option>
+                        <option value="departamento">Departamento</option>
+                        <option value="casa">Casa</option>
+                        <option value="oficina">Oficina</option>
+                        <option value="local">Local Comercial</option>
+                    </select>
+                </div>
+
+                <div class="grupo-filtro">
+                    <label for="filtro-comuna">Comuna</label>
+                    <input type="text" id="filtro-comuna" name="comuna" placeholder="Ej: Providencia">
+                </div>
+
+                <div class="grupo-filtro">
+                    <label for="filtro-precio">Precio Máximo ($)</label>
+                    <input type="number" id="filtro-precio" name="precio" placeholder="Ej: 600000">
+                </div>
+
+                <div class="grupo-filtro">
+                    <label for="filtro-dormitorios">Dormitorios</label>
+                    <select id="filtro-dormitorios" name="dormitorios">
+                        <option value="">Cualquiera</option>
+                        <option value="1">1+</option>
+                        <option value="2">2+</option>
+                        <option value="3">3+</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="boton boton-filtrar">Buscar</button>
+            </form>
+        </section>
+
+        <!-- Grilla de Propiedades (RF3) -->
+        <section class="propiedades-grilla">
+                        <!-- Propiedad 1: Departamento -->
+            <article class="tarjeta-propiedad">
+                <div class="imagen-contenedor">
+                    <img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=600&q=80" alt="Departamento Amueblado">
+                    <span class="insignia-estado disponible">Disponible</span>
+                </div>
+                <div class="info-propiedad">
+                    <span class="tipo-propiedad">Departamento</span>
+                    <h3>Departamento Amueblado en Av. Italia</h3>
+                    <p class="ubicacion">Providencia, Santiago</p>
+                    
+                    <div class="detalles-tecnicos">
+                        <span>🛏️ 2 Dorms.</span>
+                        <span>🚿 2 Baños</span>
+                        <span>📐 65 m²</span>
+                    </div>
+
+                    <div class="precio-accion">
+                        <p class="precio">$550.000 / mes</p>
+                        <a href="#" class="boton boton-ver">Ver Detalle</a>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Propiedad 2: Casa -->
+            <article class="tarjeta-propiedad">
+                <div class="imagen-contenedor">
+                    <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=600&q=80" alt="Casa Familiar">
+                    <span class="insignia-estado disponible">Disponible</span>
+                </div>
+                <div class="info-propiedad">
+                    <span class="tipo-propiedad">Casa</span>
+                    <h3>Casa Familiar con Jardín y Piscina</h3>
+                    <p class="ubicacion">Las Condes, Santiago</p>
+                    
+                    <div class="detalles-tecnicos">
+                        <span>🛏️ 4 Dorms.</span>
+                        <span>🚿 3 Baños</span>
+                        <span>📐 180 m²</span>
+                    </div>
+
+                    <div class="precio-accion">
+                        <p class="precio">$1.200.000 / mes</p>
+                        <a href="#" class="boton boton-ver">Ver Detalle</a>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Propiedad 3: Oficina -->
+            <article class="tarjeta-propiedad">
+                <div class="imagen-contenedor">
+                    <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=600&q=80" alt="Oficina Comercial">
+                    <span class="insignia-estado disponible">Disponible</span>
+                </div>
+                <div class="info-propiedad">
+                    <span class="tipo-propiedad">Oficina</span>
+                    <h3>Oficina Comercial en Sector El Golf</h3>
+                    <p class="ubicacion">Las Condes, Santiago</p>
+                    
+                    <div class="detalles-tecnicos">
+                        <span>🛏️ 2 Privados</span>
+                        <span>🚿 1 Baño</span>
+                        <span>📐 45 m²</span>
+                    </div>
+
+                    <div class="precio-accion">
+                        <p class="precio">$480.000 / mes</p>
+                        <a href="#" class="boton boton-ver">Ver Detalle</a>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Propiedad 4: Local Comercial -->
+            <article class="tarjeta-propiedad">
+                <div class="imagen-contenedor">
+                    <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80" alt="Local Comercial">
+                    <span class="insignia-estado reservada">Reservada</span>
+                </div>
+                <div class="info-propiedad">
+                    <span class="tipo-propiedad">Local comercial</span>
+                    <h3>Local Comercial a Pie de Calle</h3>
+                    <p class="ubicacion">Santiago Centro, Santiago</p>
+                    
+                    <div class="detalles-tecnicos">
+                        <span>🛏️ Planta Libre</span>
+                        <span>🚿 2 Baños</span>
+                        <span>📐 90 m²</span>
+                    </div>
+
+                    <div class="precio-accion">
+                        <p class="precio">$850.000 / mes</p>
+                        <a href="#" class="boton boton-ver">Ver Detalle</a>
+                    </div>
+                </div>
+            </article>
+            
+        </section>
+    </main>
+
+    <footer>
+        <p>Gestión Urbana Propiedades</p>
+    </footer>
+</body>
+</html>
