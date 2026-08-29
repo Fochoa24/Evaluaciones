@@ -58,111 +58,17 @@
 
                 <button type="submit" class="boton boton-filtrar">Buscar</button>
             </form>
+            <div id="mensaje-filtros" class="mensaje" role="status" aria-live="polite"></div>
         </section>
 
-        <!-- Grilla de Propiedades (RF3) -->
-        <section class="propiedades-grilla">
-                        <!-- Propiedad 1: Departamento -->
-            <article class="tarjeta-propiedad">
-                <div class="imagen-contenedor">
-                    <img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=600&q=80" alt="Departamento Amueblado">
-                    <span class="insignia-estado disponible">Disponible</span>
-                </div>
-                <div class="info-propiedad">
-                    <span class="tipo-propiedad">Departamento</span>
-                    <h3>Departamento Amueblado en Av. Italia</h3>
-                    <p class="ubicacion">Providencia, Santiago</p>
-                    
-                    <div class="detalles-tecnicos">
-                        <span>🛏️ 2 Dorms.</span>
-                        <span>🚿 2 Baños</span>
-                        <span>📐 65 m²</span>
-                    </div>
-
-                    <div class="precio-accion">
-                        <p class="precio">$550.000 / mes</p>
-                        <a href="#" class="boton boton-ver">Ver Detalle</a>
-                    </div>
-                </div>
-            </article>
-
-            <!-- Propiedad 2: Casa -->
-            <article class="tarjeta-propiedad">
-                <div class="imagen-contenedor">
-                    <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=600&q=80" alt="Casa Familiar">
-                    <span class="insignia-estado disponible">Disponible</span>
-                </div>
-                <div class="info-propiedad">
-                    <span class="tipo-propiedad">Casa</span>
-                    <h3>Casa Familiar con Jardín y Piscina</h3>
-                    <p class="ubicacion">Las Condes, Santiago</p>
-                    
-                    <div class="detalles-tecnicos">
-                        <span>🛏️ 4 Dorms.</span>
-                        <span>🚿 3 Baños</span>
-                        <span>📐 180 m²</span>
-                    </div>
-
-                    <div class="precio-accion">
-                        <p class="precio">$1.200.000 / mes</p>
-                        <a href="#" class="boton boton-ver">Ver Detalle</a>
-                    </div>
-                </div>
-            </article>
-
-            <!-- Propiedad 3: Oficina -->
-            <article class="tarjeta-propiedad">
-                <div class="imagen-contenedor">
-                    <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=600&q=80" alt="Oficina Comercial">
-                    <span class="insignia-estado disponible">Disponible</span>
-                </div>
-                <div class="info-propiedad">
-                    <span class="tipo-propiedad">Oficina</span>
-                    <h3>Oficina Comercial en Sector El Golf</h3>
-                    <p class="ubicacion">Las Condes, Santiago</p>
-                    
-                    <div class="detalles-tecnicos">
-                        <span>🛏️ 2 Privados</span>
-                        <span>🚿 1 Baño</span>
-                        <span>📐 45 m²</span>
-                    </div>
-
-                    <div class="precio-accion">
-                        <p class="precio">$480.000 / mes</p>
-                        <a href="#" class="boton boton-ver">Ver Detalle</a>
-                    </div>
-                </div>
-            </article>
-
-            <!-- Propiedad 4: Local Comercial -->
-            <article class="tarjeta-propiedad">
-                <div class="imagen-contenedor">
-                    <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80" alt="Local Comercial">
-                    <span class="insignia-estado reservada">Reservada</span>
-                </div>
-                <div class="info-propiedad">
-                    <span class="tipo-propiedad">Local comercial</span>
-                    <h3>Local Comercial a Pie de Calle</h3>
-                    <p class="ubicacion">Santiago Centro, Santiago</p>
-                    
-                    <div class="detalles-tecnicos">
-                        <span>🛏️ Planta Libre</span>
-                        <span>🚿 2 Baños</span>
-                        <span>📐 90 m²</span>
-                    </div>
-
-                    <div class="precio-accion">
-                        <p class="precio">$850.000 / mes</p>
-                        <a href="#" class="boton boton-ver">Ver Detalle</a>
-                    </div>
-                </div>
-            </article>
-            
-        </section>
+        <section class="propiedades-grilla" aria-live="polite"></section>
     </main>
 
     <footer>
         <p>Gestión Urbana Propiedades</p>
     </footer>
+
+    <script src="../js/datos.js"></script>
+    <script src="../js/formularios.js"></script>
 </body>
 </html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../css/styles.css">
+    <title>Dashboard - Gestión Urbana</title>
+</head>
+<body class="body">
+    <header class="encabezado">
+        <a class="logo" href="../index.html">Gestión Urbana</a>
+        <nav>
+            <a href="../index.html">Inicio</a>
+            <a href="./propiedades.html">Propiedades</a>
+            <a href="./login.html">Iniciar Sesión</a>
+        </nav>
+    </header>
+
+    <main class="seccion dashboard-main">
+        <section class="dashboard-header">
+            <p class="etiqueta">PANEL ADMINISTRATIVO</p>
+            <h1>Resumen del portafolio inmobiliario</h1>
+        </section>
+
+        <section id="dashboard-stats" class="dashboard-stats"></section>
+
+        <section class="table-panel">
+            <h2>Listado de propiedades</h2>
+            <div class="tabla-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Propiedad</th>
+                            <th>Tipo</th>
+                            <th>Comuna</th>
+                            <th>Estado</th>
+                            <th>Precio</th>
+                            <th>Detalle</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-propiedades-body"></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>Gestión Urbana Propiedades</p>
+    </footer>
+
+    <script src="../js/datos.js"></script>
+    <script src="../js/dashboard.js"></script>
+</body>
+</html>
