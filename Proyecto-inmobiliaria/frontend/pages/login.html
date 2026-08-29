@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../css/styles.css">
-    <title>Gestión inmobiliaria</title>
+    <title>Iniciar sesión - Gestión Urbana</title>
 </head>
 <body class="body">
     <header class="encabezado">
@@ -12,6 +12,9 @@
         <nav>
             <a href="../index.html">Inicio</a>
             <a href="./propiedades.html">Propiedades</a>
+            <a href="./dashboard.html">Mi Panel</a>
+            <a href="./registro.html">Registro</a>
+            <a href="./login.html">Iniciar Sesión</a>
         </nav>
     </header>
     
@@ -20,16 +23,17 @@
             <h2>Iniciar Sesión</h2>
             <p class="subtitulo-login">Ingresa tus credenciales para acceder a la plataforma</p>
 
-            <form id="form-login" class="formulario-login">
+            <form id="form-login" class="formulario-login" novalidate>
                 <div class="campo">
                     <label for="usuario">Usuario, RUT o Correo</label>
                     <input 
                         type="text" 
                         id="usuario" 
                         name="usuario" 
-                        placeholder="Ej: 12.345.678-9 o usuario@email.com" 
-                        required
+                        placeholder="Ej: 12.345.678-5 o usuario@email.com"
+                        autocomplete="username"
                     >
+                    <small id="error-usuario" class="mensaje-campo"></small>
                 </div>
 
                 <div class="campo">
@@ -38,30 +42,47 @@
                         type="password" 
                         id="password" 
                         name="password" 
-                        placeholder="••••••••" 
-                        minlength="6"
-                        required
+                        placeholder="••••••••"
+                        autocomplete="current-password"
                     >
+                    <small id="error-password" class="mensaje-campo"></small>
                 </div>
 
                 <div class="campo">
                     <label for="perfil">Tipo de Usuario</label>
-                    <select id="perfil" name="perfil" required>
+                    <select id="perfil" name="perfil">
                         <option value="" disabled selected>Selecciona tu perfil</option>
                         <option value="cliente">Cliente / Arrendatario</option>
                         <option value="propietario">Propietario</option>
                         <option value="ejecutivo">Ejecutivo Inmobiliario</option>
                         <option value="admin">Administrador</option>
                     </select>
+                    <small id="error-perfil" class="mensaje-campo"></small>
                 </div>
 
                 <button type="submit" class="boton boton-login">Ingresar</button>
+                <p id="mensaje-login" class="mensaje-formulario" role="status"></p>
+                <p class="texto-suave">¿No tienes cuenta? <a href="./registro.html">Regístrate</a></p>
             </form>
+
+            <aside class="cuentas-demo">
+                <p>Cuentas de prueba (clave: <strong>123456</strong>)</p>
+                <ul>
+                    <li>Cliente: ana@correo.cl</li>
+                    <li>Propietario: luis@correo.cl</li>
+                    <li>Ejecutivo: elena@gestionurbana.cl</li>
+                    <li>Admin: admin@gestionurbana.cl</li>
+                </ul>
+            </aside>
         </section>
     </main>
 
     <footer>
         <p>Gestión Urbana Propiedades</p>
     </footer>
+
+    <script src="../js/validacion.js"></script>
+    <script src="../js/datos.js"></script>
+    <script src="../js/login.js"></script>
 </body>
 </html>

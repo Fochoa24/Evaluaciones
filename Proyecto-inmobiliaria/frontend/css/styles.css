@@ -106,11 +106,24 @@ nav a:hover {
     max-width: 540px;
 }
 
+.etiqueta {
+    color: var(--verde);
+    font-size: 0.8rem;
+    font-weight: bold;
+    letter-spacing: 0.14em;
+}
+
+.hero .etiqueta {
+    color: var(--amarillo);
+}
+
 .boton {
     background-color: var(--amarillo);
     border: 2px solid var(--amarillo);
     color: var(--verde-oscuro);
+    cursor: pointer;
     display: inline-block;
+    font-family: inherit;
     font-weight: bold;
     padding: 14px 24px;
     text-decoration: none;
@@ -144,11 +157,10 @@ nav a:hover {
 }
 
 .beneficios {
-    display: grid;
+    display: flex;
     gap: 24px;
-    grid-template-columns: repeat(3, 1fr);
-    align-items: start;
     transition: transform 0.5s ease;
+    width: 100%;
 }
 
 .beneficios article:hover {
@@ -174,6 +186,8 @@ nav a:hover {
     background: var(--blanco);
     border: 4px solid transparent;
     border-bottom-color: var(--amarillo);
+    box-sizing: border-box;
+    flex: 0 0 calc((100% - 48px) / 3);
     min-height: 190px;
     overflow: hidden;
     padding: 30px 25px;
@@ -301,10 +315,12 @@ footer {
 }
 
 .campo input,
-.campo select {
+.campo select,
+.campo textarea {
     border: 1.5px solid #d0d7d5;
     border-radius: 6px;
     color: var(--texto);
+    font-family: inherit;
     font-size: 1rem;
     padding: 12px 14px;
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
@@ -312,10 +328,41 @@ footer {
 }
 
 .campo input:focus,
-.campo select:focus {
+.campo select:focus,
+.campo textarea:focus {
     border-color: var(--verde);
     box-shadow: 0 0 0 3px rgba(36, 113, 93, 0.15);
     outline: none;
+}
+
+.campo input.invalido,
+.campo select.invalido,
+.campo textarea.invalido {
+    border-color: #b42318;
+}
+
+.mensaje-campo {
+    color: #b42318;
+    font-size: 0.8rem;
+    min-height: 1em;
+}
+
+.mensaje-formulario {
+    border-radius: 8px;
+    font-size: 0.9rem;
+    min-height: 1em;
+}
+
+.mensaje-formulario.exito {
+    background: var(--verde-claro);
+    color: var(--verde-oscuro);
+    padding: 12px 14px;
+}
+
+.mensaje-formulario.error {
+    background: #fde8e8;
+    color: #b42318;
+    padding: 12px 14px;
 }
 
 .boton-login {
@@ -368,9 +415,26 @@ footer {
     padding: 10px;
 }
 
-.boton-filtrar {
+.boton-filtrar,
+.boton-secundario {
     cursor: pointer;
     padding: 11px 20px;
+}
+
+.boton-secundario {
+    background-color: transparent;
+    color: var(--verde-oscuro);
+}
+
+.boton-secundario:hover {
+    background-color: var(--verde-oscuro);
+    color: var(--blanco);
+}
+
+.contador-resultados {
+    color: var(--gris);
+    font-size: 0.9rem;
+    margin-top: 16px;
 }
 
 /* Grilla de Tarjetas */
@@ -416,6 +480,29 @@ footer {
     position: absolute;
     right: 12px;
     top: 12px;
+}
+
+.insignia-estado.disponible {
+    background: var(--verde);
+}
+
+.insignia-estado.reservada {
+    background: #c47a2c;
+}
+
+.tarjeta-propiedad.oculta {
+    display: none;
+}
+
+.sin-resultados {
+    color: var(--gris);
+    grid-column: 1 / -1;
+    padding: 40px 20px;
+    text-align: center;
+}
+
+.sin-resultados a {
+    color: var(--verde);
 }
 
 .info-propiedad {
@@ -473,6 +560,232 @@ footer {
     padding: 8px 14px;
 }
 
+.encabezado-catalogo h1 {
+    color: var(--verde-oscuro);
+    font-family: Georgia, serif;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    margin-top: 8px;
+}
+
+/* Ficha de propiedad */
+
+.enlace-volver {
+    color: var(--verde);
+    display: inline-block;
+    font-weight: bold;
+    margin-bottom: 22px;
+    text-decoration: none;
+}
+
+.detalle-layout {
+    display: grid;
+    gap: 32px;
+    grid-template-columns: 1.15fr 0.85fr;
+}
+
+.imagen-detalle {
+    border-radius: 12px;
+    height: 360px;
+    margin-bottom: 18px;
+    overflow: hidden;
+}
+
+.detalle-descripcion {
+    color: var(--gris);
+    line-height: 1.7;
+    margin: 12px 0 22px;
+}
+
+.detalle-datos {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: repeat(2, 1fr);
+    list-style: none;
+    margin-bottom: 20px;
+}
+
+.detalle-datos li {
+    background: var(--blanco);
+    border-radius: 8px;
+    padding: 12px 14px;
+}
+
+.detalle-datos strong {
+    color: var(--gris);
+    display: block;
+    font-size: 0.8rem;
+}
+
+.lista-caracteristicas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    list-style: none;
+}
+
+.lista-caracteristicas li {
+    background: var(--verde-claro);
+    border-radius: 20px;
+    color: var(--verde-oscuro);
+    font-size: 0.85rem;
+    padding: 6px 12px;
+}
+
+.detalle-lateral {
+    align-self: start;
+}
+
+.precio-detalle {
+    font-size: 1.6rem;
+}
+
+.gastos-comunes {
+    color: var(--gris);
+    margin: 6px 0 20px;
+}
+
+.tarjeta-visita {
+    background: var(--blanco);
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(18, 60, 54, 0.12);
+    padding: 24px;
+}
+
+.tarjeta-visita h2 {
+    color: var(--verde-oscuro);
+    font-family: Georgia, serif;
+    font-size: 1.4rem;
+    margin-bottom: 16px;
+}
+
+.formulario-visita {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.aviso-reserva {
+    background: #fff4e5;
+    border-radius: 8px;
+    color: #8a4b08;
+    padding: 12px 14px;
+}
+
+.texto-suave {
+    color: var(--gris);
+    font-size: 0.95rem;
+    text-align: center;
+}
+
+.texto-suave a {
+    color: var(--verde);
+    font-weight: bold;
+}
+
+.cuentas-demo {
+    background: var(--crema);
+    border-radius: 8px;
+    margin-top: 22px;
+    padding: 14px 16px;
+}
+
+.cuentas-demo p {
+    color: var(--verde-oscuro);
+    font-size: 0.85rem;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.cuentas-demo ul {
+    color: var(--gris);
+    font-size: 0.85rem;
+    padding-left: 18px;
+}
+
+.cuentas-demo li {
+    margin: 4px 0;
+}
+
+.tarjeta-registro {
+    max-width: 520px;
+}
+
+.panel-encabezado {
+    align-items: flex-start;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.panel-stats {
+    display: grid;
+    gap: 18px;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    margin-bottom: 28px;
+}
+
+.tarjeta-dato,
+.tarjeta-panel {
+    background: var(--blanco);
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(18, 60, 54, 0.08);
+    padding: 20px 22px;
+}
+
+.tarjeta-dato p {
+    color: var(--gris);
+    font-size: 0.85rem;
+}
+
+.tarjeta-dato strong {
+    color: var(--verde-oscuro);
+    font-size: 1.6rem;
+}
+
+.tarjeta-panel {
+    margin-bottom: 24px;
+}
+
+.tarjeta-panel h2 {
+    color: var(--verde-oscuro);
+    font-family: Georgia, serif;
+    font-size: 1.4rem;
+    margin-bottom: 16px;
+}
+
+.lista-simple {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    list-style: none;
+}
+
+.lista-simple li {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 12px;
+}
+
+.tabla-contenedor {
+    overflow-x: auto;
+}
+
+.tabla-panel {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.tabla-panel th,
+.tabla-panel td {
+    border-bottom: 1px solid #eee;
+    padding: 10px 8px;
+    text-align: left;
+}
+
+.tabla-panel th {
+    color: var(--gris);
+    font-size: 0.85rem;
+}
+
 
 /* Animaciones */
 
@@ -501,6 +814,16 @@ footer {
 
 /* RESPONSIVE */
 
+@media (max-width: 1024px) {
+    .beneficios article {
+        flex-basis: calc((100% - 24px) / 2);
+    }
+
+    .detalle-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
 @media (max-width: 700px) {
     .encabezado {
         align-items: flex-start;
@@ -511,7 +834,6 @@ footer {
     nav {
         flex-wrap: wrap;
         gap: 15px;
-
     }
 
     .hero {
@@ -519,21 +841,29 @@ footer {
         padding: 70px 7%;
     }
 
-    .beneficios {
-        grid-template-columns: 1fr;
+    .beneficios article {
+        flex-basis: 100%;
     }
 
     .seccion {
         padding: 60px 7%;
     }
 
-        .carrusel {
+    .carrusel {
         gap: 8px;
     }
 
     .flecha {
         height: 34px;
         width: 34px;
+    }
+
+    .detalle-datos {
+        grid-template-columns: 1fr;
+    }
+
+    .imagen-detalle {
+        height: 240px;
     }
 }
 

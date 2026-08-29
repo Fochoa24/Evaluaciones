@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../css/styles.css">
+    <title>Mi Panel - Gestión Urbana</title>
+</head>
+<body class="body">
+    <header class="encabezado">
+        <a class="logo" href="../index.html">Gestión Urbana</a>
+        <nav>
+            <a href="../index.html">Inicio</a>
+            <a href="./propiedades.html">Propiedades</a>
+            <a href="./dashboard.html">Mi Panel</a>
+            <a href="./registro.html">Registro</a>
+            <a href="./login.html">Iniciar Sesión</a>
+        </nav>
+    </header>
+
+    <main class="seccion">
+        <section class="encabezado-catalogo panel-encabezado">
+            <p class="etiqueta">PANEL DE USUARIO</p>
+            <h1 id="panel-saludo">Cargando sesión...</h1>
+            <button type="button" id="btn-salir" class="boton boton-secundario">Cerrar sesión</button>
+        </section>
+
+        <div id="panel-contenido"></div>
+    </main>
+
+    <footer>
+        <p>Gestión Urbana Propiedades</p>
+    </footer>
+
+    <script src="../js/datos.js"></script>
+    <script src="../js/dashboard.js"></script>
+</body>
+</html>

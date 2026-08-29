@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../css/styles.css">
+    <title>Detalle de propiedad - Gestión Urbana</title>
+</head>
+<body class="body">
+    <header class="encabezado">
+        <a class="logo" href="../index.html">Gestión Urbana</a>
+        <nav>
+            <a href="../index.html">Inicio</a>
+            <a href="./propiedades.html">Propiedades</a>
+            <a href="./dashboard.html">Mi Panel</a>
+            <a href="./registro.html">Registro</a>
+            <a href="./login.html">Iniciar Sesión</a>
+        </nav>
+    </header>
+
+    <main class="seccion">
+        <p id="detalle-no-encontrada" class="sin-resultados" hidden>
+            No encontramos esta propiedad.
+            <a href="./propiedades.html">Volver al catálogo</a>
+        </p>
+
+        <article id="detalle-propiedad" class="detalle-propiedad">
+            <a class="enlace-volver" href="./propiedades.html">← Volver al catálogo</a>
+
+            <div class="detalle-layout">
+                <section class="detalle-galeria">
+                    <div class="imagen-contenedor imagen-detalle">
+                        <img id="detalle-imagen" src="" alt="">
+                        <span id="detalle-estado" class="insignia-estado">Disponible</span>
+                    </div>
+                    <p id="detalle-tipo" class="tipo-propiedad"></p>
+                    <h1 id="detalle-titulo"></h1>
+                    <p id="detalle-ubicacion" class="ubicacion"></p>
+                    <p id="detalle-descripcion" class="detalle-descripcion"></p>
+
+                    <ul class="detalle-datos">
+                        <li><strong>Superficie</strong><span id="dato-superficie"></span></li>
+                        <li><strong>Dormitorios</strong><span id="dato-dormitorios"></span></li>
+                        <li><strong>Baños</strong><span id="dato-banos"></span></li>
+                        <li><strong>Estacionamientos</strong><span id="dato-estacionamientos"></span></li>
+                    </ul>
+
+                    <ul id="detalle-caracteristicas" class="lista-caracteristicas"></ul>
+                </section>
+
+                <aside class="detalle-lateral">
+                    <p id="detalle-precio" class="precio precio-detalle"></p>
+                    <p id="detalle-gastos" class="gastos-comunes"></p>
+
+                    <section class="tarjeta-visita">
+                        <h2>Solicitar visita</h2>
+                        <p id="aviso-reserva" class="aviso-reserva" hidden>
+                            Esta propiedad está reservada. Por ahora no se pueden agendar nuevas visitas.
+                        </p>
+
+                        <form id="form-visita" class="formulario-visita" novalidate>
+                            <div class="campo">
+                                <label for="visita-nombre">Nombre completo</label>
+                                <input type="text" id="visita-nombre" name="nombre" placeholder="Ej: Ana Pérez">
+                                <small id="error-visita-nombre" class="mensaje-campo"></small>
+                            </div>
+
+                            <div class="campo">
+                                <label for="visita-contacto">Correo o RUT</label>
+                                <input type="text" id="visita-contacto" name="contacto" placeholder="Ej: ana@email.com">
+                                <small id="error-visita-contacto" class="mensaje-campo"></small>
+                            </div>
+
+                            <div class="campo">
+                                <label for="visita-fecha">Fecha</label>
+                                <input type="date" id="visita-fecha" name="fecha">
+                                <small id="error-visita-fecha" class="mensaje-campo"></small>
+                            </div>
+
+                            <div class="campo">
+                                <label for="visita-hora">Hora</label>
+                                <input type="time" id="visita-hora" name="hora" min="09:00" max="18:00">
+                                <small id="error-visita-hora" class="mensaje-campo"></small>
+                            </div>
+
+                            <div class="campo">
+                                <label for="visita-observaciones">Observaciones</label>
+                                <textarea id="visita-observaciones" name="observaciones" rows="3" placeholder="Opcional"></textarea>
+                            </div>
+
+                            <button type="submit" class="boton boton-login">Enviar solicitud</button>
+                            <p id="mensaje-visita" class="mensaje-formulario" role="status"></p>
+                        </form>
+                    </section>
+                </aside>
+            </div>
+        </article>
+    </main>
+
+    <footer>
+        <p>Gestión Urbana Propiedades</p>
+    </footer>
+
+    <script src="../js/validacion.js"></script>
+    <script src="../js/datos.js"></script>
+    <script src="../js/detalle.js"></script>
+    <script src="../js/formularios.js"></script>
+</body>
+</html>

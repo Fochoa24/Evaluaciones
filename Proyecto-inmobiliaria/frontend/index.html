@@ -3,18 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestion Inmobiliaria</title>
+    <title>Gestión Inmobiliaria</title>
     <link rel="stylesheet" href="css/styles.css">
-    <link rel="stylesheet" href="css/responsive.css">
-    
 </head>
 <body class="body">
     <header class="encabezado">
         <a class="logo" href="index.html">Gestión Urbana</a>
-        
         <nav>
             <a href="index.html">Inicio</a>
             <a href="./pages/propiedades.html">Propiedades</a>
+            <a href="./pages/dashboard.html">Mi Panel</a>
+            <a href="./pages/registro.html">Registro</a>
             <a href="./pages/login.html">Iniciar Sesión</a>
         </nav>
     </header>
@@ -32,60 +31,69 @@
         </section>
 
         <section class="seccion">
-    <p class="etiqueta">NUESTROS SERVICIOS</p>
-    <h2>Propiedades para cada necesidad</h2>
+            <p class="etiqueta">NUESTROS SERVICIOS</p>
+            <h2>Propiedades para cada necesidad</h2>
 
-        <div class="ventana-carrusel">
-            <div class="beneficios" id="beneficios">
-                <article>
-                    <h3>Catálogo actualizado</h3>
-                    <p>
-                        Consulta propiedades según comuna, precio y características.
-                    </p>
-                </article>
+            <div class="carrusel">
+                <button type="button" class="flecha" id="carrusel-prev" aria-label="Ver servicios anteriores">‹</button>
 
-                <article>
-                    <h3>Visitas coordinadas</h3>
-                    <p>
-                        Solicita una visita indicando la fecha y hora que prefieras.
-                    </p>
-                </article>
+                <div class="ventana-carrusel">
+                    <div class="beneficios" id="beneficios">
+                        <article>
+                            <h3>Catálogo actualizado</h3>
+                            <p>
+                                Consulta propiedades según comuna, precio y características.
+                            </p>
+                        </article>
 
-                <article>
-                    <h3>Asesoría personalizada</h3>
-                    <p>
-                        Recibe orientación de nuestros expertos inmobiliarios.
-                    </p>
-                </article>
+                        <article>
+                            <h3>Visitas coordinadas</h3>
+                            <p>
+                                Solicita una visita indicando la fecha y hora que prefieras.
+                            </p>
+                        </article>
 
-                <article>
-                    <h3>Proceso transparente</h3>
-                    <p>
-                        Conoce el estado de tu solicitud y recibe información clara durante todo el proceso.
-                    </p>
-                </article>
+                        <article>
+                            <h3>Asesoría personalizada</h3>
+                            <p>
+                                Recibe orientación de nuestros expertos inmobiliarios.
+                            </p>
+                        </article>
 
-                <article>
-                    <h3>Propiedades verificadas</h3>
-                    <p>
-                        Encuentra inmuebles con información revisada y características detalladas.
-                    </p>
-                </article>
+                        <article>
+                            <h3>Proceso transparente</h3>
+                            <p>
+                                Conoce el estado de tu solicitud y recibe información clara durante todo el proceso.
+                            </p>
+                        </article>
 
-                <article>
-                    <h3>Atención rápida</h3>
-                    <p>
-                        Resuelve tus dudas con el apoyo de nuestro equipo inmobiliario.
-                    </p>
-                </article>
+                        <article>
+                            <h3>Propiedades verificadas</h3>
+                            <p>
+                                Encuentra inmuebles con información revisada y características detalladas.
+                            </p>
+                        </article>
+
+                        <article>
+                            <h3>Atención rápida</h3>
+                            <p>
+                                Resuelve tus dudas con el apoyo de nuestro equipo inmobiliario.
+                            </p>
+                        </article>
+                    </div>
+                </div>
+
+                <button type="button" class="flecha" id="carrusel-next" aria-label="Ver más servicios">›</button>
             </div>
-        </div>
 
+            <div class="indicadores" id="carrusel-indicadores"></div>
+        </section>
     </main>
 
     <footer>
         <p>Gestión Urbana Propiedades</p>
     </footer>
 
+    <script src="js/carousel.js"></script>
 </body>
 </html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../css/styles.css">
+    <title>Registro - Gestión Urbana</title>
+</head>
+<body class="body">
+    <header class="encabezado">
+        <a class="logo" href="../index.html">Gestión Urbana</a>
+        <nav>
+            <a href="../index.html">Inicio</a>
+            <a href="./propiedades.html">Propiedades</a>
+            <a href="./dashboard.html">Mi Panel</a>
+            <a href="./registro.html">Registro</a>
+            <a href="./login.html">Iniciar Sesión</a>
+        </nav>
+    </header>
+
+    <main class="login-contenedor">
+        <section class="tarjeta-login tarjeta-registro">
+            <h2>Crear cuenta</h2>
+            <p class="subtitulo-login">Regístrate como cliente o propietario para usar la plataforma</p>
+
+            <form id="form-registro" class="formulario-login" novalidate>
+                <div class="campo">
+                    <label for="registro-nombre">Nombre completo</label>
+                    <input type="text" id="registro-nombre" name="nombre" placeholder="Ej: Ana Pérez" autocomplete="name">
+                    <small id="error-registro-nombre" class="mensaje-campo"></small>
+                </div>
+
+                <div class="campo">
+                    <label for="registro-rut">RUT</label>
+                    <input type="text" id="registro-rut" name="rut" placeholder="Ej: 12.345.678-5" autocomplete="off">
+                    <small id="error-registro-rut" class="mensaje-campo"></small>
+                </div>
+
+                <div class="campo">
+                    <label for="registro-email">Correo electrónico</label>
+                    <input type="email" id="registro-email" name="email" placeholder="Ej: ana@email.com" autocomplete="email">
+                    <small id="error-registro-email" class="mensaje-campo"></small>
+                </div>
+
+                <div class="campo">
+                    <label for="registro-telefono">Teléfono</label>
+                    <input type="tel" id="registro-telefono" name="telefono" placeholder="Ej: +56 9 1234 5678" autocomplete="tel">
+                    <small id="error-registro-telefono" class="mensaje-campo"></small>
+                </div>
+
+                <div class="campo">
+                    <label for="registro-password">Contraseña</label>
+                    <input type="password" id="registro-password" name="password" placeholder="Mínimo 6 caracteres" autocomplete="new-password">
+                    <small id="error-registro-password" class="mensaje-campo"></small>
+                </div>
+
+                <div class="campo">
+                    <label for="registro-confirmar">Confirmar contraseña</label>
+                    <input type="password" id="registro-confirmar" name="confirmar" placeholder="Repite la contraseña" autocomplete="new-password">
+                    <small id="error-registro-confirmar" class="mensaje-campo"></small>
+                </div>
+
+                <div class="campo">
+                    <label for="registro-perfil">Tipo de cuenta</label>
+                    <select id="registro-perfil" name="perfil">
+                        <option value="" disabled selected>Selecciona tu perfil</option>
+                        <option value="cliente">Cliente / Arrendatario</option>
+                        <option value="propietario">Propietario</option>
+                    </select>
+                    <small id="error-registro-perfil" class="mensaje-campo"></small>
+                </div>
+
+                <button type="submit" class="boton boton-login">Registrarme</button>
+                <p id="mensaje-registro" class="mensaje-formulario" role="status"></p>
+                <p class="texto-suave">¿Ya tienes cuenta? <a href="./login.html">Inicia sesión</a></p>
+            </form>
+        </section>
+    </main>
+
+    <footer>
+        <p>Gestión Urbana Propiedades</p>
+    </footer>
+
+    <script src="../js/validacion.js"></script>
+    <script src="../js/datos.js"></script>
+    <script src="../js/formularios.js"></script>
+</body>
+</html>
