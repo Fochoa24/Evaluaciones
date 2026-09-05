@@ -86,5 +86,5 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     form.addEventListener('submit', aplicarFiltros);
-    renderizarPropiedades(window.propiedades);
+    window.propiedadesListas.then(renderizarPropiedades);
 });

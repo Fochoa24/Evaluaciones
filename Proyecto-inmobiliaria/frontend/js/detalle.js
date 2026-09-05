@@ -5,39 +5,41 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const params = new URLSearchParams(window.location.search);
-    const id = Number(params.get('id'));
-    const data = window.propiedades || [];
-    const propiedad = data.find((item) => item.id === id) || data[0];
+    const id = params.get('id');
 
-    if (!propiedad) {
-        contenedor.innerHTML = '<p class="mensaje error visible">No se encontró la propiedad solicitada.</p>';
-        return;
-    }
+    window.propiedadesListas.then((data) => {
+        const propiedad = data.find((item) => item.id === id) || data[0];
 
-    contenedor.innerHTML = `
-        <article class="detalle-contenedor">
-            <div class="detalle-imagen">
-                <img src="${propiedad.imagen}" alt="${propiedad.titulo}">
-            </div>
-            <div class="detalle-info">
-                <span class="tipo-propiedad">${propiedad.tipo}</span>
-                <h1>${propiedad.titulo}</h1>
-                <p class="ubicacion">${propiedad.ubicacion}</p>
+        if (!propiedad) {
+            contenedor.innerHTML = '<p class="mensaje error visible">No se encontró la propiedad solicitada.</p>';
+            return;
+        }
 
-                <div class="detalle-precio">
-                    <strong>$${propiedad.precioMensual.toLocaleString('es-CL')}</strong>
-                    <span class="badge ${propiedad.estado === 'Reservada' ? 'reservada' : 'disponible'}">${propiedad.estado}</span>
+        contenedor.innerHTML = `
+            <article class="detalle-contenedor">
+                <div class="detalle-imagen">
+                    <img src="${propiedad.imagen}" alt="${propiedad.titulo}">
                 </div>
+                <div class="detalle-info">
+                    <span class="tipo-propiedad">${propiedad.tipo}</span>
+                    <h1>${propiedad.titulo}</h1>
+                    <p class="ubicacion">${propiedad.ubicacion}</p>
 
-                <ul class="detalle-lista">
-                    <li>📍 Comuna: ${propiedad.comuna}</li>
-                    <li>🛏️ Dormitorios: ${propiedad.dormitorios}</li>
-                    <li>🚿 Baños: ${propiedad.banos}</li>
-                    <li>📐 Superficie: ${propiedad.superficie} m²</li>
-                </ul>
+                    <div class="detalle-precio">
+                        <strong>$${propiedad.precioMensual.toLocaleString('es-CL')}</strong>
+                        <span class="badge ${propiedad.estado === 'Reservada' ? 'reservada' : 'disponible'}">${propiedad.estado}</span>
+                    </div>
 
-                <a href="./propiedades.html" class="boton boton-ver">Volver al catálogo</a>
-            </div>
-        </article>
-    `;
+                    <ul class="detalle-lista">
+                        <li>📍 Comuna: ${propiedad.comuna}</li>
+                        <li>🛏️ Dormitorios: ${propiedad.dormitorios}</li>
+                        <li>🚿 Baños: ${propiedad.banos}</li>
+                        <li>📐 Superficie: ${propiedad.superficie} m²</li>
+                    </ul>
+
+                    <a href="./propiedades.html" class="boton boton-ver">Volver al catálogo</a>
+                </div>
+            </article>
+        `;
+    });
 });

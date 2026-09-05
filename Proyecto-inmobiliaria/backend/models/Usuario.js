@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 
+//modelo usuario
+
 const usuarioSchema = new mongoose.Schema({
     nombre: { type: String, required: true },
     rut: { type: String, required: true, unique: true },
