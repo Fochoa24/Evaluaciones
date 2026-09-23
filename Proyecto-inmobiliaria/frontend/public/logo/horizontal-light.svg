@@ -1,0 +1,13 @@
+<svg width="420" height="140" viewBox="0 0 420 140" xmlns="http://www.w3.org/2000/svg">
+  <g>
+    <rect x="18" y="70" width="16" height="46" fill="#24715D"/>
+    <rect x="106" y="60" width="16" height="56" fill="#24715D"/>
+    <rect x="40" y="82" width="12" height="34" fill="#24715D" opacity="0.6"/>
+    <rect x="88" y="76" width="12" height="40" fill="#24715D" opacity="0.6"/>
+    <rect x="42" y="72" width="56" height="44" fill="#123C36"/>
+    <path d="M 34 76 L 70 20 L 106 76 L 92 76 L 70 42 L 48 76 Z" fill="#EFBD55"/>
+    <path d="M 62 116 L 62 96 A 8 8 0 0 1 78 96 L 78 116 Z" fill="#F5F2E9"/>
+  </g>
+  <text x="152" y="76" font-family="Fraunces, Georgia, 'Times New Roman', serif" font-weight="700" font-size="34" fill="#123C36">Gestión</text>
+  <text x="152" y="100" font-family="Inter, Arial, Helvetica, sans-serif" font-weight="600" font-size="15" letter-spacing="2.4" fill="#EFBD55">URBANA</text>
+</svg>
