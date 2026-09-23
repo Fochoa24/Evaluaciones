@@ -87,7 +87,7 @@ export default function Footer() {
                         Plataforma de gestión inmobiliaria para explorar propiedades,
                         coordinar visitas y administrar tu portafolio de forma simple y transparente.
                     </p>
-                    <div className="pie-redes" aria-label="Redes sociales">
+                    <nav className="pie-redes" aria-label="Redes sociales">
                         {redes.map((red) => (
                             <a
                                 key={red.nombre}
@@ -100,7 +100,7 @@ export default function Footer() {
                                 {red.icono}
                             </a>
                         ))}
-                    </div>
+                    </nav>
                 </div>
 
                 <div className="pie-columna">

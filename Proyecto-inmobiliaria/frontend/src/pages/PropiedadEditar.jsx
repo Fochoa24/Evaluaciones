@@ -11,7 +11,9 @@ export default function PropiedadEditar() {
     if (!propiedad) {
         return (
             <main className="seccion">
-                <p className="mensaje error visible">No se encontró la propiedad solicitada.</p>
+                <p className="mensaje error visible" role="alert">
+                    No se encontró la propiedad solicitada.
+                </p>
                 <Link to="/propiedades" className="boton boton-ver">
                     Volver al catálogo
                 </Link>

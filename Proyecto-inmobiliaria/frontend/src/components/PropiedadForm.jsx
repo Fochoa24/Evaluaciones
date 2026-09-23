@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { ESTADOS_PROPIEDAD, IMAGEN_DEFECTO, TIPOS_PROPIEDAD } from '../data/propiedades';
 import Mensaje from './Mensaje';
 
@@ -36,32 +36,54 @@ function normalizar(valores) {
 export default function PropiedadForm({ valoresIniciales, onSubmit, textoBoton = 'Guardar' }) {
     const [form, setForm] = useState(() => normalizar(valoresIniciales));
     const [mensaje, setMensaje] = useState('');
+    const [erroresCampo, setErroresCampo] = useState({});
+    const formRef = useRef(null);
 
     const handleChange = (event) => {
         const { name, value } = event.target;
         setForm((prev) => ({ ...prev, [name]: value }));
+        setErroresCampo((prev) => {
+            if (!prev[name]) return prev;
+            const siguiente = { ...prev };
+            delete siguiente[name];
+            return siguiente;
+        });
+    };
+
+    const focoPrimerError = (errores) => {
+        const primero = Object.keys(errores)[0];
+        if (!primero || !formRef.current) return;
+        const campo = formRef.current.elements.namedItem(primero);
+        if (campo && typeof campo.focus === 'function') {
+            campo.focus();
+        }
     };
 
     const handleSubmit = (event) => {
         event.preventDefault();
 
-        if (!form.titulo.trim() || !form.comuna.trim()) {
-            setMensaje('El título y la comuna son obligatorios.');
-            return;
-        }
+        const errores = {};
+        if (!form.titulo.trim()) errores.titulo = 'El título es obligatorio.';
+        if (!form.comuna.trim()) errores.comuna = 'La comuna es obligatoria.';
 
         const precio = Number(form.precioMensual);
         if (!Number.isFinite(precio) || precio <= 0) {
-            setMensaje('Ingresa un precio mensual válido.');
-            return;
+            errores.precioMensual = 'Ingresa un precio mensual válido.';
         }
 
         const superficie = Number(form.superficie);
         if (!Number.isFinite(superficie) || superficie <= 0) {
-            setMensaje('Ingresa una superficie válida en m².');
+            errores.superficie = 'Ingresa una superficie válida en m².';
+        }
+
+        if (Object.keys(errores).length > 0) {
+            setErroresCampo(errores);
+            setMensaje('Revisa los campos marcados.');
+            focoPrimerError(errores);
             return;
         }
 
+        setErroresCampo({});
         setMensaje('');
         onSubmit({
             titulo: form.titulo.trim(),
@@ -79,7 +101,13 @@ export default function PropiedadForm({ valoresIniciales, onSubmit, textoBoton =
     };
 
     return (
-        <form onSubmit={handleSubmit} className="formulario-propiedad">
+        <form
+            ref={formRef}
+            onSubmit={handleSubmit}
+            className="formulario-propiedad"
+            noValidate
+            aria-label="Formulario de propiedad"
+        >
             <div className="campo campo-completo">
                 <label htmlFor="titulo">Título</label>
                 <input
@@ -90,7 +118,14 @@ export default function PropiedadForm({ valoresIniciales, onSubmit, textoBoton =
                     value={form.titulo}
                     onChange={handleChange}
                     required
+                    aria-invalid={erroresCampo.titulo ? 'true' : undefined}
+                    aria-describedby={erroresCampo.titulo ? 'titulo-error' : undefined}
                 />
+                {erroresCampo.titulo && (
+                    <span id="titulo-error" className="error-campo">
+                        {erroresCampo.titulo}
+                    </span>
+                )}
             </div>
 
             <div className="campo">
@@ -125,7 +160,14 @@ export default function PropiedadForm({ valoresIniciales, onSubmit, textoBoton =
                     value={form.comuna}
                     onChange={handleChange}
                     required
+                    aria-invalid={erroresCampo.comuna ? 'true' : undefined}
+                    aria-describedby={erroresCampo.comuna ? 'comuna-error' : undefined}
                 />
+                {erroresCampo.comuna && (
+                    <span id="comuna-error" className="error-campo">
+                        {erroresCampo.comuna}
+                    </span>
+                )}
             </div>
 
             <div className="campo">
@@ -163,7 +205,14 @@ export default function PropiedadForm({ valoresIniciales, onSubmit, textoBoton =
                     value={form.precioMensual}
                     onChange={handleChange}
                     required
+                    aria-invalid={erroresCampo.precioMensual ? 'true' : undefined}
+                    aria-describedby={erroresCampo.precioMensual ? 'precioMensual-error' : undefined}
                 />
+                {erroresCampo.precioMensual && (
+                    <span id="precioMensual-error" className="error-campo">
+                        {erroresCampo.precioMensual}
+                    </span>
+                )}
             </div>
 
             <div className="campo">
@@ -177,7 +226,14 @@ export default function PropiedadForm({ valoresIniciales, onSubmit, textoBoton =
                     value={form.superficie}
                     onChange={handleChange}
                     required
+                    aria-invalid={erroresCampo.superficie ? 'true' : undefined}
+                    aria-describedby={erroresCampo.superficie ? 'superficie-error' : undefined}
                 />
+                {erroresCampo.superficie && (
+                    <span id="superficie-error" className="error-campo">
+                        {erroresCampo.superficie}
+                    </span>
+                )}
             </div>
 
             <div className="campo">

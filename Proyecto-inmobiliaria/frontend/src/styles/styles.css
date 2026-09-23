@@ -1733,11 +1733,19 @@ td {
     text-align: left;
 }
 
-th {
+thead th {
     background: #f5f7f6;
     color: var(--verde-oscuro);
     font-size: 0.85rem;
     text-transform: uppercase;
+}
+
+tbody th {
+    background: transparent;
+    color: var(--texto);
+    font-size: inherit;
+    font-weight: 700;
+    text-transform: none;
 }
 
 .link-detalle {
@@ -1860,7 +1868,12 @@ th {
 }
 
 .boton-mini {
+    align-items: center;
+    display: inline-flex;
     font-size: 0.8rem;
+    justify-content: center;
+    min-height: 24px;
+    min-width: 24px;
     padding: 7px 12px;
 }
 

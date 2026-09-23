@@ -61,22 +61,22 @@ export default function Dashboard() {
             <section className="table-panel">
                 <h2>Listado de propiedades</h2>
                 <div className="tabla-wrap">
-                    <table>
+                    <table aria-label="Listado de propiedades del portafolio">
                         <thead>
                             <tr>
-                                <th>Propiedad</th>
-                                <th>Tipo</th>
-                                <th>Comuna</th>
-                                <th>Estado</th>
-                                <th>Precio</th>
-                                <th>Detalle</th>
-                                {puedeGestionar && <th>Acciones</th>}
+                                <th scope="col">Propiedad</th>
+                                <th scope="col">Tipo</th>
+                                <th scope="col">Comuna</th>
+                                <th scope="col">Estado</th>
+                                <th scope="col">Precio</th>
+                                <th scope="col">Detalle</th>
+                                {puedeGestionar && <th scope="col">Acciones</th>}
                             </tr>
                         </thead>
                         <tbody>
                             {propiedades.map((propiedad) => (
                                 <tr key={propiedad.id}>
-                                    <td>{propiedad.titulo}</td>
+                                    <th scope="row">{propiedad.titulo}</th>
                                     <td>{propiedad.tipo}</td>
                                     <td>{propiedad.comuna}</td>
                                     <td>
@@ -84,7 +84,11 @@ export default function Dashboard() {
                                     </td>
                                     <td>${propiedad.precioMensual.toLocaleString('es-CL')}</td>
                                     <td>
-                                        <Link to={`/propiedades/${propiedad.id}`} className="link-detalle">
+                                        <Link
+                                            to={`/propiedades/${propiedad.id}`}
+                                            className="link-detalle"
+                                            aria-label={`Ver detalle de ${propiedad.titulo}`}
+                                        >
                                             Ver
                                         </Link>
                                     </td>
@@ -94,6 +98,7 @@ export default function Dashboard() {
                                                 <Link
                                                     to={`/propiedades/${propiedad.id}/editar`}
                                                     className="boton boton-mini"
+                                                    aria-label={`Editar ${propiedad.titulo}`}
                                                 >
                                                     Editar
                                                 </Link>
@@ -101,6 +106,7 @@ export default function Dashboard() {
                                                     type="button"
                                                     className="boton boton-mini boton-peligro"
                                                     onClick={() => handleEliminar(propiedad)}
+                                                    aria-label={`Eliminar ${propiedad.titulo}`}
                                                 >
                                                     Eliminar
                                                 </button>

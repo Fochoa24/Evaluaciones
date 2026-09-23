@@ -82,8 +82,8 @@ export default function Propiedades() {
                 )}
             </section>
 
-            <section className="contenedor-filtros">
-                <form onSubmit={aplicarFiltros} className="bar-filtros">
+            <section className="contenedor-filtros" aria-label="Filtros de búsqueda">
+                <form onSubmit={aplicarFiltros} className="bar-filtros" role="search">
                     <div className="grupo-filtro">
                         <label htmlFor="filtro-tipo">Tipo</label>
                         <select
@@ -146,13 +146,13 @@ export default function Propiedades() {
                 <Mensaje texto={mensaje.texto} tipo={mensaje.tipo} />
             </section>
 
-            <section className="propiedades-grilla" aria-live="polite">
+            <section className="propiedades-grilla" aria-live="polite" aria-label="Resultados de propiedades">
                 {resultados.length ? (
                     resultados.map((propiedad) => (
                         <PropiedadCard key={propiedad.id} propiedad={propiedad} />
                     ))
                 ) : (
-                    <div className="mensaje sin-resultados visible">
+                    <div className="mensaje sin-resultados visible" role="status">
                         No se encontraron propiedades con esos filtros.
                     </div>
                 )}

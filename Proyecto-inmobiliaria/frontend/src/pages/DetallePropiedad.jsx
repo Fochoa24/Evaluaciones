@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import Badge from '../components/Badge';
 import Mensaje from '../components/Mensaje';
@@ -22,6 +22,7 @@ export default function DetallePropiedad() {
     const { user } = useAuth();
     const { obtener, eliminar } = usePropiedades();
     const { crear } = useVisitas();
+    const formRef = useRef(null);
 
     const propiedad = obtener(id);
     const puedeGestionar = user && ROLES_GESTION.includes(user.rol);
@@ -34,11 +35,14 @@ export default function DetallePropiedad() {
         telefono: user?.telefono || ''
     }));
     const [mensaje, setMensaje] = useState({ texto: '', tipo: 'success' });
+    const [erroresCampo, setErroresCampo] = useState({});
 
     if (!propiedad) {
         return (
             <main className="seccion detalle-main">
-                <p className="mensaje error visible">No se encontró la propiedad solicitada.</p>
+                <p className="mensaje error visible" role="alert">
+                    No se encontró la propiedad solicitada.
+                </p>
             </main>
         );
     }
@@ -46,19 +50,43 @@ export default function DetallePropiedad() {
     const handleChange = (event) => {
         const { name, value } = event.target;
         setSolicitud((prev) => ({ ...prev, [name]: value }));
+        setErroresCampo((prev) => {
+            if (!prev[name]) return prev;
+            const siguiente = { ...prev };
+            delete siguiente[name];
+            return siguiente;
+        });
+    };
+
+    const focoPrimerError = (errores) => {
+        const primero = Object.keys(errores)[0];
+        if (!primero || !formRef.current) return;
+        const campo = formRef.current.elements.namedItem(primero);
+        if (campo && typeof campo.focus === 'function') {
+            campo.focus();
+        }
     };
 
     const solicitarVisita = (event) => {
         event.preventDefault();
 
-        if (!solicitud.nombre.trim() || !solicitud.email.trim() || !solicitud.fecha || !solicitud.hora) {
+        const errores = {};
+        if (!solicitud.nombre.trim()) errores.nombre = 'Ingresa tu nombre.';
+        if (!solicitud.email.trim()) errores.email = 'Ingresa tu correo.';
+        if (!solicitud.fecha) errores.fecha = 'Elige una fecha.';
+        if (!solicitud.hora) errores.hora = 'Elige una hora.';
+
+        if (Object.keys(errores).length > 0) {
+            setErroresCampo(errores);
             setMensaje({
                 texto: 'Completa nombre, correo, fecha y hora para solicitar la visita.',
                 tipo: 'error'
             });
+            focoPrimerError(errores);
             return;
         }
 
+        setErroresCampo({});
         crear({
             propiedadId: propiedad.id,
             propiedadTitulo: propiedad.titulo,
@@ -102,11 +130,22 @@ export default function DetallePropiedad() {
                         </div>
 
                         <ul className="detalle-lista">
-                            <li>📍 Comuna: {propiedad.comuna}</li>
-                            <li>🏠 Dirección: {propiedad.direccion || 'Sin dirección registrada'}</li>
-                            <li>🛏️ Dormitorios: {propiedad.dormitorios}</li>
-                            <li>🚿 Baños: {propiedad.banos}</li>
-                            <li>📐 Superficie: {propiedad.superficie} m²</li>
+                            <li>
+                                <span aria-hidden="true">📍</span> Comuna: {propiedad.comuna}
+                            </li>
+                            <li>
+                                <span aria-hidden="true">🏠</span> Dirección:{' '}
+                                {propiedad.direccion || 'Sin dirección registrada'}
+                            </li>
+                            <li>
+                                <span aria-hidden="true">🛏️</span> Dormitorios: {propiedad.dormitorios}
+                            </li>
+                            <li>
+                                <span aria-hidden="true">🚿</span> Baños: {propiedad.banos}
+                            </li>
+                            <li>
+                                <span aria-hidden="true">📐</span> Superficie: {propiedad.superficie} m²
+                            </li>
                         </ul>
 
                         <div className="acciones-detalle">
@@ -138,7 +177,13 @@ export default function DetallePropiedad() {
                     Elige la fecha y hora que prefieras y coordinamos el recorrido.
                 </p>
 
-                <form onSubmit={solicitarVisita} className="formulario-propiedad">
+                <form
+                    ref={formRef}
+                    onSubmit={solicitarVisita}
+                    className="formulario-propiedad"
+                    noValidate
+                    aria-label="Formulario de solicitud de visita"
+                >
                     <div className="campo">
                         <label htmlFor="nombre-visita">Nombre</label>
                         <input
@@ -148,7 +193,15 @@ export default function DetallePropiedad() {
                             value={solicitud.nombre}
                             onChange={handleChange}
                             required
+                            autoComplete="name"
+                            aria-invalid={erroresCampo.nombre ? 'true' : undefined}
+                            aria-describedby={erroresCampo.nombre ? 'nombre-visita-error' : undefined}
                         />
+                        {erroresCampo.nombre && (
+                            <span id="nombre-visita-error" className="error-campo">
+                                {erroresCampo.nombre}
+                            </span>
+                        )}
                     </div>
 
                     <div className="campo">
@@ -160,7 +213,15 @@ export default function DetallePropiedad() {
                             value={solicitud.email}
                             onChange={handleChange}
                             required
+                            autoComplete="email"
+                            aria-invalid={erroresCampo.email ? 'true' : undefined}
+                            aria-describedby={erroresCampo.email ? 'email-visita-error' : undefined}
                         />
+                        {erroresCampo.email && (
+                            <span id="email-visita-error" className="error-campo">
+                                {erroresCampo.email}
+                            </span>
+                        )}
                     </div>
 
                     <div className="campo">
@@ -172,6 +233,7 @@ export default function DetallePropiedad() {
                             placeholder="Ej: +56 9 1234 5678"
                             value={solicitud.telefono}
                             onChange={handleChange}
+                            autoComplete="tel"
                         />
                     </div>
 
@@ -185,7 +247,14 @@ export default function DetallePropiedad() {
                             value={solicitud.fecha}
                             onChange={handleChange}
                             required
+                            aria-invalid={erroresCampo.fecha ? 'true' : undefined}
+                            aria-describedby={erroresCampo.fecha ? 'fecha-visita-error' : undefined}
                         />
+                        {erroresCampo.fecha && (
+                            <span id="fecha-visita-error" className="error-campo">
+                                {erroresCampo.fecha}
+                            </span>
+                        )}
                     </div>
 
                     <div className="campo">
@@ -197,7 +266,14 @@ export default function DetallePropiedad() {
                             value={solicitud.hora}
                             onChange={handleChange}
                             required
+                            aria-invalid={erroresCampo.hora ? 'true' : undefined}
+                            aria-describedby={erroresCampo.hora ? 'hora-visita-error' : undefined}
                         />
+                        {erroresCampo.hora && (
+                            <span id="hora-visita-error" className="error-campo">
+                                {erroresCampo.hora}
+                            </span>
+                        )}
                     </div>
 
                     <div className="campo campo-completo">

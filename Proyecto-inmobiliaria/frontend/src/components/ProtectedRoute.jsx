@@ -12,7 +12,7 @@ export default function ProtectedRoute({ roles, children }) {
     if (roles && !roles.includes(user.rol)) {
         return (
             <main className="seccion">
-                <p className="mensaje error visible">
+                <p className="mensaje error visible" role="alert">
                     No tienes permisos para acceder a esta sección.
                 </p>
             </main>

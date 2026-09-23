@@ -25,25 +25,28 @@ export default function Visitas() {
                 <h2>Listado de solicitudes</h2>
                 {visitas.length ? (
                     <div className="tabla-wrap">
-                        <table>
+                        <table aria-label="Solicitudes de visita coordinadas">
                             <thead>
                                 <tr>
-                                    <th>Propiedad</th>
-                                    <th>Interesado</th>
-                                    <th>Contacto</th>
-                                    <th>Fecha y hora</th>
-                                    <th>Estado</th>
-                                    <th>Acciones</th>
+                                    <th scope="col">Propiedad</th>
+                                    <th scope="col">Interesado</th>
+                                    <th scope="col">Contacto</th>
+                                    <th scope="col">Fecha y hora</th>
+                                    <th scope="col">Estado</th>
+                                    <th scope="col">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {visitas.map((visita) => (
                                     <tr key={visita.id}>
-                                        <td>
-                                            <Link to={`/propiedades/${visita.propiedadId}`} className="link-detalle">
+                                        <th scope="row">
+                                            <Link
+                                                to={`/propiedades/${visita.propiedadId}`}
+                                                className="link-detalle"
+                                            >
                                                 {visita.propiedadTitulo}
                                             </Link>
-                                        </td>
+                                        </th>
                                         <td>
                                             {visita.nombre}
                                             {visita.comentarios ? (
@@ -72,6 +75,11 @@ export default function Visitas() {
                                                     type="button"
                                                     className="boton boton-mini"
                                                     onClick={() => alternarEstado(visita)}
+                                                    aria-label={
+                                                        visita.estado === 'Pendiente'
+                                                            ? `Atender visita de ${visita.nombre}`
+                                                            : `Reabrir visita de ${visita.nombre}`
+                                                    }
                                                 >
                                                     {visita.estado === 'Pendiente' ? 'Atender' : 'Reabrir'}
                                                 </button>
@@ -79,6 +87,7 @@ export default function Visitas() {
                                                     type="button"
                                                     className="boton boton-mini boton-peligro"
                                                     onClick={() => eliminarVisita(visita)}
+                                                    aria-label={`Eliminar visita de ${visita.nombre}`}
                                                 >
                                                     Eliminar
                                                 </button>
@@ -90,7 +99,7 @@ export default function Visitas() {
                         </table>
                     </div>
                 ) : (
-                    <p className="mensaje sin-resultados visible">
+                    <p className="mensaje sin-resultados visible" role="status">
                         Aún no hay solicitudes de visita. Puedes pedirla desde el detalle de cada propiedad.
                     </p>
                 )}

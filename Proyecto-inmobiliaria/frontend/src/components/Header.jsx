@@ -147,21 +147,21 @@ export default function Header() {
                                         </div>
 
                                         <Link to="/dashboard" role="menuitem" onClick={cerrarMenus}>
-                                            📊 Panel administrativo
+                                            <span aria-hidden="true">📊</span> Panel administrativo
                                         </Link>
                                         {ROLES_GESTION.includes(user.rol) && (
                                             <Link to="/propiedades/nueva" role="menuitem" onClick={cerrarMenus}>
-                                                🏠 Nueva propiedad
+                                                <span aria-hidden="true">🏠</span> Nueva propiedad
                                             </Link>
                                         )}
                                         {ROLES_ATENCION.includes(user.rol) && (
                                             <Link to="/visitas" role="menuitem" onClick={cerrarMenus}>
-                                                📅 Solicitudes de visita
+                                                <span aria-hidden="true">📅</span> Solicitudes de visita
                                             </Link>
                                         )}
 
                                         <button type="button" role="menuitem" onClick={handleLogout}>
-                                            ⎋ Cerrar sesión
+                                            <span aria-hidden="true">⎋</span> Cerrar sesión
                                         </button>
                                     </div>
                                 )}

@@ -16,14 +16,24 @@ export default function PropiedadCard({ propiedad }) {
                 <p className="ubicacion">{propiedad.ubicacion}</p>
 
                 <div className="detalles-tecnicos">
-                    <span>🛏️ {dormitoriosTexto}</span>
-                    <span>🚿 {propiedad.banos} Baños</span>
-                    <span>📐 {propiedad.superficie} m²</span>
+                    <span>
+                        <span aria-hidden="true">🛏️</span> {dormitoriosTexto}
+                    </span>
+                    <span>
+                        <span aria-hidden="true">🚿</span> {propiedad.banos} Baños
+                    </span>
+                    <span>
+                        <span aria-hidden="true">📐</span> {propiedad.superficie} m²
+                    </span>
                 </div>
 
                 <div className="precio-accion">
                     <p className="precio">${propiedad.precioMensual.toLocaleString('es-CL')} / mes</p>
-                    <Link to={`/propiedades/${propiedad.id}`} className="boton boton-ver">
+                    <Link
+                        to={`/propiedades/${propiedad.id}`}
+                        className="boton boton-ver"
+                        aria-label={`Ver detalle de ${propiedad.titulo}`}
+                    >
                         Ver Detalle
                     </Link>
                 </div>
