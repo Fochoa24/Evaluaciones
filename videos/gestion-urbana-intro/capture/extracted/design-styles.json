@@ -1,0 +1,279 @@
+{
+  "typography": [
+    {
+      "role": "display",
+      "fontFamily": "Georgia",
+      "fontSize": "88px",
+      "fontWeight": "700",
+      "lineHeight": "91.52px",
+      "letterSpacing": "-1.76px",
+      "color": "#FFFFFF",
+      "sampleText": "Encuentra el lugar ideal para tu próxima etapa."
+    },
+    {
+      "role": "heading",
+      "fontFamily": "Georgia",
+      "fontSize": "51.2px",
+      "fontWeight": "700",
+      "lineHeight": "normal",
+      "letterSpacing": "normal",
+      "color": "#123C36",
+      "sampleText": "Todo lo que necesitas, en un solo lugar"
+    },
+    {
+      "role": "heading-2",
+      "fontFamily": "Georgia",
+      "fontSize": "41.6px",
+      "fontWeight": "700",
+      "lineHeight": "49.92px",
+      "letterSpacing": "normal",
+      "color": "#FFFFFF",
+      "sampleText": "¿Listo para encontrar tu próximo hogar?"
+    },
+    {
+      "role": "heading-3",
+      "fontFamily": "Georgia",
+      "fontSize": "19.2px",
+      "fontWeight": "700",
+      "lineHeight": "normal",
+      "letterSpacing": "normal",
+      "color": "#123C36",
+      "sampleText": "Catálogo actualizado"
+    },
+    {
+      "role": "body",
+      "fontFamily": "Arial",
+      "fontSize": "18.4px",
+      "fontWeight": "500",
+      "lineHeight": "31.28px",
+      "letterSpacing": "normal",
+      "color": "#FFFFFF",
+      "sampleText": "Explora propiedades disponibles y solicita una visita de for"
+    },
+    {
+      "role": "link",
+      "fontFamily": "Arial",
+      "fontSize": "16px",
+      "fontWeight": "700",
+      "lineHeight": "normal",
+      "letterSpacing": "normal",
+      "color": "#123C36",
+      "sampleText": "Saltar al contenido principal"
+    }
+  ],
+  "spacing": {
+    "observed": [
+      4,
+      6,
+      8,
+      10,
+      11,
+      12,
+      14,
+      16,
+      18,
+      20,
+      22,
+      24,
+      26,
+      28,
+      30
+    ],
+    "baseUnit": 4
+  },
+  "radius": [
+    "4px",
+    "50%",
+    "999px"
+  ],
+  "shadows": [
+    {
+      "value": "rgba(18, 60, 54, 0.06) 0px 10px 28px 0px",
+      "count": 6
+    },
+    {
+      "value": "rgba(18, 60, 54, 0.08) 0px 6px 18px 0px",
+      "count": 3
+    },
+    {
+      "value": "rgba(18, 60, 54, 0.07) 0px 10px 28px 0px",
+      "count": 3
+    },
+    {
+      "value": "rgba(0, 0, 0, 0.3) 0px 10px 28px 0px",
+      "count": 1
+    },
+    {
+      "value": "rgba(18, 60, 54, 0.22) 0px 24px 50px 0px",
+      "count": 1
+    }
+  ],
+  "buttons": [
+    {
+      "label": "Ver Propiedades",
+      "background": "#EFBD55",
+      "backgroundImage": "",
+      "backdropFilter": "",
+      "color": "#123C36",
+      "padding": "15px 28px",
+      "borderRadius": "0px",
+      "border": "2px solid rgb(239, 189, 85)",
+      "boxShadow": "rgba(0, 0, 0, 0.3) 0px 10px 28px 0px",
+      "fontSize": "16px",
+      "fontWeight": "700",
+      "height": "52px"
+    },
+    {
+      "label": "Crear cuenta",
+      "background": "transparent",
+      "backgroundImage": "",
+      "backdropFilter": "",
+      "color": "#FFFFFF",
+      "padding": "14px 24px",
+      "borderRadius": "0px",
+      "border": "2px solid rgba(255, 255, 255, 0.55)",
+      "boxShadow": "none",
+      "fontSize": "16px",
+      "fontWeight": "700",
+      "height": "52px"
+    },
+    {
+      "label": "button",
+      "background": "#FFFFFF",
+      "backgroundImage": "",
+      "backdropFilter": "",
+      "color": "#000000",
+      "padding": "0px",
+      "borderRadius": "999px",
+      "border": "0px none rgb(0, 0, 0)",
+      "boxShadow": "none",
+      "fontSize": "13.3333px",
+      "fontWeight": "400",
+      "height": "24px"
+    },
+    {
+      "label": "button",
+      "background": "#EFBD55",
+      "backgroundImage": "",
+      "backdropFilter": "",
+      "color": "#000000",
+      "padding": "0px",
+      "borderRadius": "999px",
+      "border": "0px none rgb(0, 0, 0)",
+      "boxShadow": "none",
+      "fontSize": "13.3333px",
+      "fontWeight": "400",
+      "height": "24px"
+    },
+    {
+      "label": "Empieza hoy¿Listo para encontrar tu próx",
+      "background": "#F5F2E9",
+      "backgroundImage": "",
+      "backdropFilter": "",
+      "color": "#20302B",
+      "padding": "72px 134.391px 88px",
+      "borderRadius": "0px",
+      "border": "0px none rgb(32, 48, 43)",
+      "boxShadow": "none",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "height": "598.812px"
+    },
+    {
+      "label": "Empieza hoy¿Listo para encontrar tu próx",
+      "background": "transparent",
+      "backgroundImage": "radial-gradient(circle at 88% 18%, rgba(239, 189, 85, 0.18), rgba(0, 0, 0, 0) 32%), linear-gradient(145deg, rgb(18, 60, 54) 0%, rgb(26, 79, 70) 55%, rgb(36, 113, 93) 100%)",
+      "backdropFilter": "",
+      "color": "#FFFFFF",
+      "padding": "56px 56px 52px",
+      "borderRadius": "28px",
+      "border": "0px none rgb(255, 255, 255)",
+      "boxShadow": "rgba(18, 60, 54, 0.22) 0px 24px 50px 0px",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "height": "438.812px"
+    }
+  ],
+  "cards": [
+    {
+      "label": "card",
+      "background": "#FFFFFF",
+      "backgroundImage": "",
+      "backdropFilter": "",
+      "color": "#20302B",
+      "padding": "28px 24px 26px",
+      "borderRadius": "16px",
+      "border": "",
+      "boxShadow": "rgba(18, 60, 54, 0.06) 0px 10px 28px 0px",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "height": "236.234px"
+    },
+    {
+      "label": "card",
+      "background": "#FFFFFF",
+      "backgroundImage": "",
+      "backdropFilter": "",
+      "color": "#20302B",
+      "padding": "0px",
+      "borderRadius": "12px",
+      "border": "0px none rgb(32, 48, 43)",
+      "boxShadow": "rgba(18, 60, 54, 0.08) 0px 6px 18px 0px",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "height": "409px"
+    },
+    {
+      "label": "card",
+      "background": "#FFFFFF",
+      "backgroundImage": "",
+      "backdropFilter": "",
+      "color": "#20302B",
+      "padding": "30px 26px",
+      "borderRadius": "16px",
+      "border": "0px none rgb(32, 48, 43)",
+      "boxShadow": "rgba(18, 60, 54, 0.07) 0px 10px 28px 0px",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "height": "222.172px"
+    }
+  ],
+  "nav": {
+    "label": "navigation",
+    "background": "#123C36",
+    "backgroundImage": "",
+    "backdropFilter": "",
+    "color": "#20302B",
+    "padding": "0px",
+    "borderRadius": "0px",
+    "border": "0px none rgb(32, 48, 43)",
+    "boxShadow": "none",
+    "fontSize": "16px",
+    "fontWeight": "400",
+    "height": "88px"
+  },
+  "chips": [],
+  "statCells": [
+    {
+      "background": "transparent",
+      "borderRadius": "0px",
+      "border": "0px none rgb(255, 255, 255)",
+      "boxShadow": "none",
+      "numberFontSize": "44.8px",
+      "numberFontWeight": "700",
+      "numberColor": "#EFBD55"
+    }
+  ],
+  "tabs": [],
+  "backgrounds": [
+    {
+      "value": "linear-gradient(90deg, rgba(0, 0, 0, 0.78), rgba(0, 0, 0, 0.5) 45%, rgba(0, 0, 0, 0.22)), linear-gradient(rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0) 45%, rgba(0, 0, 0, 0.4) 100%)",
+      "area": 1242450
+    },
+    {
+      "value": "radial-gradient(circle at 88% 18%, rgba(239, 189, 85, 0.18), rgba(0, 0, 0, 0) 32%), linear-gradient(145deg, rgb(18, 60, 54) 0%, rgb(26, 79, 70) 55%, rgb(36, 113, 93) 100%)",
+      "area": 482694
+    }
+  ],
+  "glass": []
+}

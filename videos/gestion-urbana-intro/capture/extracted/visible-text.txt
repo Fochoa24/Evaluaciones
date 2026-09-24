@@ -1,0 +1,116 @@
+[a] Saltar al contenido principal
+[a] Propiedades
+[a] Iniciar Sesión
+[a] Registrarse
+[p] Gestión inmobiliaria
+[h1] Encuentra el lugar ideal para
+[span] tu próxima etapa
+[p] Explora propiedades disponibles y solicita una visita de forma rápida y sencilla.
+[a] Ver Propiedades
+[a] Crear cuenta
+[p] Imagen 3 de 4: Interior luminoso de vivienda
+[p] Nuestros servicios
+[h2] Todo lo que necesitas, en un solo lugar
+[p] Diseñamos la experiencia completa: desde que encuentras una propiedad hasta que coordinamos tu visita.
+[h3] Catálogo actualizado
+[p] Filtra por comuna, precio, tipo y dormitorios hasta encontrar el inmueble ideal.
+[h3] Visitas coordinadas
+[p] Elige fecha y hora en la ficha de la propiedad y te confirmamos el recorrido.
+[h3] Asesoría personalizada
+[p] Ejecutivos inmobiliarios te orientan según tu presupuesto y estilo de vida.
+[h3] Proceso transparente
+[p] Estado claro de cada solicitud y información verificada durante todo el proceso.
+[h3] Propiedades verificadas
+[p] Fichas con características reales: superficie, dormitorios, estado y precio.
+[h3] Atención rápida
+[p] Resuelve dudas por correo o teléfono con soporte de nuestro equipo inmobiliario.
+[strong] 120+
+[span] Propiedades gestionadas
+[span] Comunas en Santiago
+[strong] 98%
+[span] Clientes satisfechos
+[strong] 48h
+[span] Respuesta promedio
+[p] Destacadas
+[h2] Propiedades disponibles hoy
+[p] Una selección del catálogo para que empieces a explorar sin filtros.
+[span] Disponible
+[span] Departamento
+[h3] Departamento Amueblado en Av. Italia
+[p] Providencia, Santiago
+[span] 🛏️
+[span] 2 Dorm.
+[span] Baños
+[p] 550.000
+[p] / mes
+[a] Ver Detalle
+[span] Disponible
+[span] Casa
+[h3] Casa Familiar con Jardín y Piscina
+[p] Las Condes, Santiago
+[span] 🛏️
+[span] 4 Dorm.
+[span] Baños
+[span] 180
+[p] 1.200.000
+[p] / mes
+[a] Ver Detalle
+[span] Disponible
+[span] Oficina
+[h3] Oficina Comercial en Sector El Golf
+[p] Las Condes, Santiago
+[span] 🛏️
+[span] 2 Dorm.
+[span] Baños
+[p] 480.000
+[p] / mes
+[a] Ver Detalle
+[a] Ver catálogo completo
+[p] Cómo funciona
+[h2] Tres pasos y listo
+[h3] Explora el catálogo
+[p] Busca por comuna, precio, tipo de inmueble y cantidad de dormitorios.
+[h3] Solicita una visita
+[p] En la ficha elige fecha y hora; dejamos tus datos de contacto listos.
+[h3] Coordinamos contigo
+[p] Confirmamos el horario y un ejecutivo te acompaña en el recorrido.
+[p] Empieza hoy
+[h2] ¿Listo para encontrar tu próximo hogar?
+[p] Crea tu cuenta, guarda favoritos del catálogo y solicita visitas en minutos.
+[a] Explorar propiedades
+[a] Registrarme gratis
+[strong] 120+
+[span] Propiedades
+[strong] 48h
+[span] Respuesta
+[span] Comunas
+[p] Plataforma de gestión inmobiliaria para explorar propiedades, coordinar visitas y administrar tu portafolio de forma simple y transparente.
+[h3] Navegación
+[a] Propiedades
+[a] Panel administrativo
+[a] Solicitudes de visita
+[a] Iniciar sesión
+[a] Crear cuenta
+[h3] Servicios
+[a] Catálogo de inmuebles
+[a] Visitas coordinadas
+[a] Asesoría personalizada
+[a] Proceso transparente
+[a] Propiedades verificadas
+[a] Atención rápida
+[h3] Contacto
+[span] Dirección
+[span] Av. Providencia 1234, Santiago, Chile
+[span] Teléfono
+[a] +56 9 1234 5678
+[a] contacto@gestionurbana.cl
+[span] Lun a Vie · 09:00 – 18:00
+[p] Gestión Urbana Propiedades. Todos los derechos reservados.
+[a] Privacidad
+[a] Términos de uso
+[button] Configurar cookies
+[strong] Valoramos tu privacidad
+[p] Usamos cookies propias para recordar tu preferencia y mejorar la experiencia. Puedes aceptarlas o rechazarlas. Más información en nuestra
+[a] política de cookies
+[button] Rechazar
+[button] Aceptar

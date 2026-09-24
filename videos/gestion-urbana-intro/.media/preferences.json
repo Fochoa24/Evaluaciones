@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "preferences": {
+    "destination": {
+      "value": "youtube",
+      "confirmed_in": [
+        "gestion-urbana-intro"
+      ],
+      "updated_at": "2026-09-23T19:08:14.991Z"
+    },
+    "aspect": {
+      "value": "1920x1080",
+      "confirmed_in": [
+        "gestion-urbana-intro"
+      ],
+      "updated_at": "2026-09-23T19:08:15.159Z"
+    },
+    "language": {
+      "value": "es",
+      "confirmed_in": [
+        "gestion-urbana-intro"
+      ],
+      "updated_at": "2026-09-23T19:08:15.324Z"
+    },
+    "flow": {
+      "value": "automation",
+      "confirmed_in": [
+        "gestion-urbana-intro"
+      ],
+      "updated_at": "2026-09-23T19:08:15.484Z"
+    },
+    "storyboard": {
+      "value": "no",
+      "confirmed_in": [
+        "gestion-urbana-intro"
+      ],
+      "updated_at": "2026-09-23T19:08:15.642Z"
+    },
+    "style_preset.product-launch-video": {
+      "value": "editorial-forest",
+      "confirmed_in": [
+        "gestion-urbana-intro"
+      ],
+      "updated_at": "2026-09-24T11:12:46.778Z"
+    }
+  },
+  "sightings": {}
+}

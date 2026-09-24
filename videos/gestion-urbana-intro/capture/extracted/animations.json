@@ -1,0 +1,173 @@
+{
+  "summary": {
+    "webAnimations": 4,
+    "cssDeclarations": 64,
+    "scrollTargets": 0,
+    "cdpAnimations": 31,
+    "canvases": 0
+  },
+  "namedAnimations": [
+    "aparecer",
+    "deslizar-suave",
+    "aparecer-menu"
+  ],
+  "scrollTriggeredElements": 0,
+  "representativeAnimations": [
+    {
+      "type": "CSSTransition",
+      "playState": "running",
+      "animationName": null,
+      "targetSelector": "header.encabezado",
+      "targetRect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 88,
+        "top": 0,
+        "right": 1920,
+        "bottom": 88,
+        "left": 0
+      },
+      "keyframes": [
+        {
+          "offset": 0,
+          "easing": "linear",
+          "composite": "auto",
+          "boxShadow": "rgba(0, 0, 0, 0.28) 0px 10px 30px 0px",
+          "computedOffset": 0
+        },
+        {
+          "offset": 1,
+          "easing": "linear",
+          "composite": "auto",
+          "boxShadow": "none",
+          "computedOffset": 1
+        }
+      ],
+      "timing": {
+        "duration": 300,
+        "delay": 0,
+        "iterations": 1,
+        "easing": "ease",
+        "direction": "normal"
+      }
+    },
+    {
+      "type": "CSSTransition",
+      "playState": "running",
+      "animationName": null,
+      "targetSelector": "div.hero-diapositiva",
+      "targetRect": {
+        "x": -32.29913330078125,
+        "y": 77.11404418945312,
+        "width": 1984.59814453125,
+        "height": 668.88134765625,
+        "top": 77.11404418945312,
+        "right": 1952.2990112304688,
+        "bottom": 745.9953918457031,
+        "left": -32.29913330078125
+      },
+      "keyframes": [
+        {
+          "offset": 0,
+          "easing": "linear",
+          "composite": "auto",
+          "transform": "scale(1)",
+          "computedOffset": 0
+        },
+        {
+          "offset": 1,
+          "easing": "linear",
+          "composite": "auto",
+          "transform": "scale(1.05)",
+          "computedOffset": 1
+        }
+      ],
+      "timing": {
+        "duration": 5000,
+        "delay": 0,
+        "iterations": 1,
+        "easing": "ease",
+        "direction": "normal"
+      }
+    },
+    {
+      "type": "CSSTransition",
+      "playState": "running",
+      "animationName": null,
+      "targetSelector": "div.hero-diapositiva.activa",
+      "targetRect": {
+        "x": -15.700927734375,
+        "y": 82.70822143554688,
+        "width": 1951.40185546875,
+        "height": 657.69287109375,
+        "top": 82.70822143554688,
+        "right": 1935.700927734375,
+        "bottom": 740.4010925292969,
+        "left": -15.700927734375
+      },
+      "keyframes": [
+        {
+          "offset": 0,
+          "easing": "linear",
+          "composite": "auto",
+          "transform": "scale(1.05)",
+          "computedOffset": 0
+        },
+        {
+          "offset": 1,
+          "easing": "linear",
+          "composite": "auto",
+          "transform": "scale(1)",
+          "computedOffset": 1
+        }
+      ],
+      "timing": {
+        "duration": 5000,
+        "delay": 0,
+        "iterations": 1,
+        "easing": "ease",
+        "direction": "normal"
+      }
+    },
+    {
+      "type": "CSSAnimation",
+      "playState": "finished",
+      "animationName": "deslizar-suave",
+      "targetSelector": "div.hero-contenido",
+      "targetRect": {
+        "x": 192,
+        "y": 178,
+        "width": 760,
+        "height": 467.109375,
+        "top": 178,
+        "right": 952,
+        "bottom": 645.109375,
+        "left": 192
+      },
+      "keyframes": [
+        {
+          "offset": 0,
+          "easing": "ease",
+          "composite": "auto",
+          "transform": "translateY(18px)",
+          "computedOffset": 0
+        },
+        {
+          "offset": 1,
+          "easing": "ease",
+          "composite": "auto",
+          "transform": "translateY(0px)",
+          "computedOffset": 1
+        }
+      ],
+      "timing": {
+        "duration": 700,
+        "delay": 100,
+        "iterations": 1,
+        "easing": "linear",
+        "direction": "normal"
+      }
+    }
+  ]
+}

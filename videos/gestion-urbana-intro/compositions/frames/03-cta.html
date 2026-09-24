@@ -1,0 +1,191 @@
+<template>
+<style>
+@font-face {
+  font-family: "Arial";
+  src: local("Arial");
+  font-weight: 400 800;
+  font-display: swap;
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  src: local("JetBrains Mono");
+  font-weight: 500;
+  font-display: swap;
+}
+#root {
+  width: 1920px;
+  height: 1080px;
+  container-type: size;
+  position: relative;
+  overflow: hidden;
+}
+#root .clip {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+#root .f03-cta-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+#root .f03-cta-veil {
+  width: 100%;
+  height: 100%;
+  background: #123C36;
+  opacity: 0.58;
+}
+#root .f03-cta-stage {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+#root .f03-cta-topbar {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 44px 96px 0 96px;
+  font-family: "JetBrains Mono", monospace;
+  font-weight: 500;
+  font-size: 26px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #EFBD55;
+}
+#root .f03-cta-mark {
+  width: 72px;
+  height: 72px;
+  border: 2px solid #EFBD55;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  letter-spacing: 0.08em;
+  color: #EFBD55;
+}
+#root .f03-cta-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-top: 120px;
+  font-family: "Arial", sans-serif;
+  font-weight: 500;
+  font-size: 4.6cqi;
+  line-height: 1.0;
+  letter-spacing: -0.02em;
+  color: #FFFFFF;
+  max-width: 78cqi;
+}
+#root .f03-cta-hero .f03-cta-accent {
+  color: #EFBD55;
+}
+#root .f03-cta-rule {
+  margin-top: 40px;
+  width: 120px;
+  height: 2px;
+  background: #EFBD55;
+}
+#root .f03-cta-pillwrap {
+  position: relative;
+  margin-top: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#root .f03-cta-glow {
+  position: absolute;
+  inset: -30px -70px;
+  background: #EFBD55;
+  border-radius: 50%;
+  filter: blur(70px);
+  opacity: 0;
+}
+#root .f03-cta-pill {
+  position: relative;
+  font-family: "Arial", sans-serif;
+  font-weight: 500;
+  font-size: 1.7cqi;
+  letter-spacing: -0.01em;
+  color: #533B08;
+  background: #EFBD55;
+  border-radius: 999px;
+  padding: 24px 68px;
+  white-space: nowrap;
+}
+#root .f03-cta-pill .f03-cta-pw {
+  display: inline-block;
+  margin: 0 0.16em;
+}
+#root .f03-cta-url {
+  margin-top: 30px;
+  font-family: "JetBrains Mono", monospace;
+  font-weight: 500;
+  font-size: 27px;
+  letter-spacing: 0.04em;
+  color: #FFFFFF;
+  white-space: nowrap;
+}
+#root .f03-cta-url .f03-cta-uc {
+  display: inline-block;
+}
+</style>
+<div data-hf-id="hf-ihex" id="root" data-composition-id="03-cta" data-width="1920" data-height="1080">
+  <div data-hf-id="hf-rer5" class="clip" data-start="0" data-duration="3" data-track-index="0">
+    <img data-hf-id="hf-syh1" class="f03-cta-photo" id="f03-cta-photo" src="assets/photo-1512917774080-9991f1c4c750.jpg" alt="">
+  </div>
+  <div data-hf-id="hf-qn3c" class="clip" data-start="0" data-duration="3" data-track-index="1">
+    <div data-hf-id="hf-17my" class="f03-cta-veil" id="f03-cta-veil"></div>
+  </div>
+  <div data-hf-id="hf-zaz7" class="clip" data-start="0" data-duration="3" data-track-index="2">
+    <div data-hf-id="hf-5iux" class="f03-cta-stage">
+      <div data-hf-id="hf-4uku" class="f03-cta-topbar" id="f03-cta-topbar">
+        <span data-hf-id="hf-17yn">Gestión Urbana</span>
+        <span data-hf-id="hf-kqsb" class="f03-cta-mark">GU</span>
+      </div>
+      <h1 data-hf-id="hf-n5f4" class="f03-cta-hero" id="f03-cta-hero">
+        <span data-hf-id="hf-tbtr">¿Listo para encontrar</span>
+        <span data-hf-id="hf-r7im">tu <span data-hf-id="hf-jxhc" class="f03-cta-accent">próximo hogar?</span></span>
+      </h1>
+      <div data-hf-id="hf-xpnm" class="f03-cta-rule" id="f03-cta-rule"></div>
+      <div data-hf-id="hf-9k2o" class="f03-cta-pillwrap">
+        <div data-hf-id="hf-og82" class="f03-cta-glow" id="f03-cta-glow"></div>
+        <div data-hf-id="hf-co7e" class="f03-cta-pill" id="f03-cta-pill"><span data-hf-id="hf-p2xs" class="f03-cta-pw">Ver</span><span data-hf-id="hf-q949" class="f03-cta-pw">Propiedades</span></div>
+      </div>
+      <div data-hf-id="hf-w6ya" class="f03-cta-url" id="f03-cta-url"><span data-hf-id="hf-shwk" class="f03-cta-uc">frontend-ebon-six-27.vercel.app</span><span data-hf-id="hf-yhgb" class="f03-cta-uc">/propiedades</span></div>
+    </div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<script>
+(function () {
+  window.__timelines = window.__timelines || {};
+  var tl = gsap.timeline({ paused: true });
+  window.__timelines["03-cta"] = tl;
+
+  // Scene 1 (0.0-1.2): green brand field over dimmed photo; topbar settles,
+  // claim enters in ONE slide-up crossfade (titlecard-reveal signature).
+  tl.fromTo("#f03-cta-topbar", { opacity: 0, y: -14 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" }, 0);
+  tl.fromTo("#f03-cta-hero", { opacity: 0, y: 46 }, { opacity: 1, y: 0, duration: 0.75, ease: "power3.out" }, 0.05);
+  tl.fromTo("#f03-cta-rule", { opacity: 0, scaleX: 0 }, { opacity: 1, scaleX: 1, duration: 0.4, ease: "power3.out" }, 0.95);
+
+  // Scene 2 (1.2-3.0): yellow pill reveals word by word; soft glow rises
+  // behind it; URL reveals in two chunks; then a calm deliberate hold.
+  var pillWords = document.querySelectorAll("#f03-cta-pill .f03-cta-pw");
+  for (var i = 0; i < pillWords.length; i++) {
+    tl.fromTo(pillWords[i], { opacity: 0, y: 22 }, { opacity: 1, y: 0, duration: 0.45, ease: "power3.out" }, 1.2 + i * 0.15);
+  }
+  tl.fromTo("#f03-cta-glow", { opacity: 0 }, { opacity: 0.5, duration: 0.6, ease: "power2.out" }, 1.25);
+  var urlChunks = document.querySelectorAll("#f03-cta-url .f03-cta-uc");
+  for (var j = 0; j < urlChunks.length; j++) {
+    tl.fromTo(urlChunks[j], { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" }, 1.6 + j * 0.2);
+  }
+})();
+</script>
+</template>

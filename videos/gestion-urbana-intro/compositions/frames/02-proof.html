@@ -1,0 +1,309 @@
+<template>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<style>
+@font-face {
+  font-family: "Arial";
+  src: local("Arial"), local("Liberation Sans"), local("DejaVu Sans");
+  font-weight: 400 600;
+  font-display: swap;
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  src: local("JetBrains Mono"), local("DejaVu Sans Mono"), local("monospace");
+  font-weight: 500;
+  font-display: swap;
+}
+#root {
+  width: 1920px;
+  height: 1080px;
+  container-type: size;
+  position: relative;
+  overflow: hidden;
+  background: #FFFFFF;
+  font-family: "Arial", "Liberation Sans", sans-serif;
+}
+#root .f02-proof-bg {
+  position: absolute;
+  inset: 0;
+  background: #FFFFFF;
+}
+#root .f02-proof-topbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1920px;
+  height: 96px;
+  padding: 0 96px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 2px solid #6A4B0A;
+}
+#root .f02-proof-eyebrow {
+  font-family: "JetBrains Mono", monospace;
+  font-weight: 500;
+  font-size: 26px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #6A4B0A;
+}
+#root .f02-proof-counter {
+  font-family: "JetBrains Mono", monospace;
+  font-weight: 500;
+  font-size: 26px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #6A4B0A;
+}
+#root .f02-proof-main {
+  position: absolute;
+  top: 150px;
+  left: 96px;
+  width: 1728px;
+  height: 700px;
+  display: flex;
+  gap: 72px;
+}
+#root .f02-proof-photos {
+  position: relative;
+  width: 1030px;
+  height: 700px;
+}
+#root .f02-proof-burst {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+#root .f02-proof-item {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  will-change: transform;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #F8E1B2;
+}
+#root .f02-proof-hero {
+  width: 470px;
+  height: 620px;
+  border: 2px solid #6A4B0A;
+}
+#root .f02-proof-sup {
+  width: 400px;
+  height: 295px;
+  border: 2px solid #6A4B0A;
+}
+#root .f02-proof-item img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+#root .f02-proof-tag {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  padding: 8px 14px;
+  background: #EFBD55;
+  border-radius: 6px;
+  font-family: "JetBrains Mono", monospace;
+  font-weight: 500;
+  font-size: 22px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #123C36;
+}
+#root .f02-proof-data {
+  width: 626px;
+  height: 700px;
+  display: flex;
+  flex-direction: column;
+}
+#root .f02-proof-kicker {
+  font-family: "JetBrains Mono", monospace;
+  font-weight: 500;
+  font-size: 24px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #6A4B0A;
+  margin-bottom: 14px;
+}
+#root .f02-proof-title {
+  font-weight: 500;
+  font-size: 68px;
+  line-height: 0.98;
+  letter-spacing: -0.01em;
+  color: #20302B;
+  margin-bottom: 18px;
+}
+#root .f02-proof-w {
+  display: inline-block;
+  margin-right: 18px;
+}
+#root .f02-proof-rule {
+  height: 2px;
+  background: #6A4B0A;
+  margin: 6px 0 20px 0;
+}
+#root .f02-proof-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+#root .f02-proof-stat {
+  display: flex;
+  align-items: baseline;
+  gap: 18px;
+  border-top: 2px solid #6A4B0A;
+  padding-top: 10px;
+}
+#root .f02-proof-num {
+  display: flex;
+  align-items: baseline;
+  min-width: 300px;
+}
+#root .f02-proof-figure {
+  display: inline-block;
+  font-weight: 500;
+  font-size: 104px;
+  line-height: 0.92;
+  letter-spacing: -0.03em;
+  color: #6A4B0A;
+  font-variant-numeric: tabular-nums;
+  transform-origin: left center;
+}
+#root .f02-proof-suffix {
+  display: inline-block;
+  font-weight: 500;
+  font-size: 56px;
+  line-height: 0.92;
+  color: #6A4B0A;
+  margin-left: 4px;
+}
+#root .f02-proof-statlabel {
+  font-family: "JetBrains Mono", monospace;
+  font-weight: 500;
+  font-size: 24px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #20302B;
+}
+#root .f02-proof-chip {
+  margin-top: 22px;
+  align-self: flex-start;
+  padding: 12px 26px;
+  background: #EFBD55;
+  border: 2px solid #6A4B0A;
+  border-radius: 6px;
+  font-family: "JetBrains Mono", monospace;
+  font-weight: 500;
+  font-size: 26px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #123C36;
+}
+</style>
+<div data-hf-id="hf-ntxo" id="root" data-composition-id="f02-proof" data-width="1920" data-height="1080" data-duration="4.6">
+  <div data-hf-id="hf-1ku9" class="clip f02-proof-bg" data-start="0" data-duration="4.6" data-track-index="0"></div>
+  <div data-hf-id="hf-y405" class="clip f02-proof-topbar" data-start="0" data-duration="4.6" data-track-index="1">
+    <span data-hf-id="hf-sngh" class="f02-proof-eyebrow">Catálogo verificado · Santiago</span>
+    <span data-hf-id="hf-n4zc" class="f02-proof-counter">02 — Prueba</span>
+  </div>
+  <div data-hf-id="hf-782x" class="clip f02-proof-main" data-start="0" data-duration="4.6" data-track-index="2">
+    <div data-hf-id="hf-l4uh" class="f02-proof-photos">
+      <div data-hf-id="hf-0kg0" class="f02-proof-burst">
+        <div data-hf-id="hf-lg1c" class="f02-proof-item f02-proof-hero" data-target-x="-272" data-target-y="6">
+          <img data-hf-id="hf-dt3v" src="assets/departamento-amueblado-en-av-italia.jpg" alt="Departamento amueblado en Av. Italia">
+          <span data-hf-id="hf-50v6" class="f02-proof-tag">Av. Italia</span>
+        </div>
+        <div data-hf-id="hf-1hj9" class="f02-proof-item f02-proof-sup" data-target-x="252" data-target-y="-168">
+          <img data-hf-id="hf-z8zf" src="assets/casa-familiar-con-jardn-y-piscina.jpg" alt="Casa familiar con jardín y piscina">
+        </div>
+        <div data-hf-id="hf-ymdc" class="f02-proof-item f02-proof-sup" data-target-x="252" data-target-y="168">
+          <img data-hf-id="hf-ty1g" src="assets/oficina-comercial-en-sector-el-golf.jpg" alt="Oficina comercial en El Golf">
+        </div>
+      </div>
+    </div>
+    <div data-hf-id="hf-bhhi" class="f02-proof-data">
+      <div data-hf-id="hf-jw3e" class="f02-proof-kicker">Inventario real</div>
+      <h1 data-hf-id="hf-0w7y" class="f02-proof-title"><span data-hf-id="hf-t466" class="f02-proof-w" id="f02-proof-w1">Propiedades</span><span data-hf-id="hf-tupd" class="f02-proof-w" id="f02-proof-w2">disponibles</span><span data-hf-id="hf-5188" class="f02-proof-w" id="f02-proof-w3">hoy</span></h1>
+      <div data-hf-id="hf-95wi" class="f02-proof-rule" id="f02-proof-rule"></div>
+      <div data-hf-id="hf-ibzv" class="f02-proof-stats">
+        <div data-hf-id="hf-sb4o" class="f02-proof-stat">
+          <div data-hf-id="hf-b9ry" class="f02-proof-num"><span data-hf-id="hf-hcq8" class="f02-proof-figure" id="f02-proof-n1">0</span><span data-hf-id="hf-ty6h" class="f02-proof-suffix" id="f02-proof-s1">+</span></div>
+          <span data-hf-id="hf-k490" class="f02-proof-statlabel" id="f02-proof-l1">Propiedades</span>
+        </div>
+        <div data-hf-id="hf-bycw" class="f02-proof-stat">
+          <div data-hf-id="hf-7rqa" class="f02-proof-num"><span data-hf-id="hf-nntt" class="f02-proof-figure" id="f02-proof-n2">0</span><span data-hf-id="hf-dn82" class="f02-proof-suffix" id="f02-proof-s2">%</span></div>
+          <span data-hf-id="hf-lfao" class="f02-proof-statlabel" id="f02-proof-l2">Satisfacción</span>
+        </div>
+        <div data-hf-id="hf-arft" class="f02-proof-stat">
+          <div data-hf-id="hf-861b" class="f02-proof-num"><span data-hf-id="hf-r8da" class="f02-proof-figure" id="f02-proof-n3">0</span><span data-hf-id="hf-d2tq" class="f02-proof-suffix" id="f02-proof-s3">h</span></div>
+          <span data-hf-id="hf-s4rc" class="f02-proof-statlabel" id="f02-proof-l3">Respuesta</span>
+        </div>
+      </div>
+      <div data-hf-id="hf-4vvx" class="f02-proof-chip" id="f02-proof-chip">Verificadas</div>
+    </div>
+  </div>
+</div>
+<script>
+(function () {
+  window.__timelines = window.__timelines || {};
+  var tl = gsap.timeline({ paused: true });
+  window.__timelines["f02-proof"] = tl;
+
+  function byId(id) { return document.getElementById(id); }
+
+  // Scene 1 (0.0-1.2): center-outward expansion of the triptych + word-by-word title
+  var items = document.getElementsByClassName("f02-proof-item");
+  Array.prototype.forEach.call(items, function (el, i) {
+    var at = 0.05 + i * 0.07;
+    tl.fromTo(
+      el,
+      { xPercent: -50, yPercent: -50, x: 0, y: 0, scale: 0.6, opacity: 0 },
+      { x: Number(el.getAttribute("data-target-x")), y: Number(el.getAttribute("data-target-y")), scale: 1, opacity: 1, duration: 1.0, ease: "power3.out" },
+      at
+    );
+  });
+  ["f02-proof-w1", "f02-proof-w2", "f02-proof-w3"].forEach(function (id, i) {
+    tl.fromTo(
+      byId(id),
+      { y: 34, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.55, ease: "power3.out" },
+      0.15 + i * 0.2
+    );
+  });
+  tl.fromTo(byId("f02-proof-rule"), { scaleX: 0, transformOrigin: "left center" }, { scaleX: 1, duration: 0.6, ease: "power3.out" }, 0.6);
+
+  // Scene 2 (1.2-2.8): value-scaled counters, staggered 120+ then 98% then 48h
+  function countUp(numId, sufId, labId, target, at, dur) {
+    var num = byId(numId);
+    var state = { value: 0 };
+    tl.to(
+      state,
+      {
+        value: target,
+        duration: dur,
+        ease: "power3.out",
+        onUpdate: function () { num.textContent = String(Math.round(state.value)); }
+      },
+      at
+    );
+    tl.fromTo(num, { scale: 0.55 }, { scale: 1, duration: dur, ease: "power3.out" }, at);
+    tl.fromTo(byId(sufId), { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.35, ease: "back.out(1.6)" }, at + dur);
+    tl.fromTo(byId(labId), { y: 12, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: "power2.out" }, at + 0.15);
+  }
+  countUp("f02-proof-n1", "f02-proof-s1", "f02-proof-l1", 120, 1.2, 1.2);
+  countUp("f02-proof-n2", "f02-proof-s2", "f02-proof-l2", 98, 1.6, 1.0);
+  countUp("f02-proof-n3", "f02-proof-s3", "f02-proof-l3", 48, 2.0, 0.8);
+
+  // Scene 3 (2.8-4.0): hold + flat highlight bloom on "verificadas", still
+  tl.fromTo(
+    byId("f02-proof-chip"),
+    { scale: 0.85, opacity: 0 },
+    { scale: 1, opacity: 1, duration: 0.5, ease: "back.out(1.5)" },
+    2.8
+  );
+})();
+</script>
+</template>
