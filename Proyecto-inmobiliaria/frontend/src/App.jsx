@@ -3,6 +3,7 @@ import ConsentBanner from './components/ConsentBanner';
 import Footer from './components/Footer';
 import Header from './components/Header';
 import ProtectedRoute from './components/ProtectedRoute';
+import ScrollToTop from './components/ScrollToTop';
 import { ArriendosProvider } from './context/ArriendosContext';
 import { AuthProvider } from './context/AuthContext';
 import { PropiedadesProvider } from './context/PropiedadesContext';
@@ -29,6 +30,7 @@ import Visitas from './pages/Visitas';
 export default function App() {
     return (
         <BrowserRouter>
+            <ScrollToTop />
             <AuthProvider>
                 <PropiedadesProvider>
                     <PropietariosProvider>
