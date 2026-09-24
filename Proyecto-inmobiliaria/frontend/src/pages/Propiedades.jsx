@@ -4,42 +4,42 @@ import Mensaje from '../components/Mensaje';
 import PropiedadCard from '../components/PropiedadCard';
 import { useAuth } from '../context/AuthContext';
 import { usePropiedades } from '../context/PropiedadesContext';
-import { tipoMap } from '../data/propiedades';
+import { usePropietarios } from '../context/PropietariosContext';
+import { filtrarPropiedades } from '../services/filtros';
 import { ROLES_GESTION } from '../data/roles';
 
 const filtrosIniciales = {
     tipo: '',
     comuna: '',
-    precio: '',
-    dormitorios: ''
+    precioMin: '',
+    precioMax: '',
+    dormitorios: '',
+    banos: ''
 };
-
-function filtrarPropiedades(propiedades, filtros) {
-    const tipo = filtros.tipo.trim().toLowerCase();
-    const comuna = filtros.comuna.trim().toLowerCase();
-    const precio = Number(filtros.precio);
-    const dormitorios = Number(filtros.dormitorios);
-
-    return propiedades.filter((propiedad) => {
-        const coincideTipo = !tipo || propiedad.tipo.toLowerCase() === tipoMap[tipo]?.toLowerCase();
-        const coincideComuna = !comuna || propiedad.comuna.toLowerCase().includes(comuna);
-        const coincidePrecio = !precio || propiedad.precioMensual <= precio;
-        const coincideDormitorios = !dormitorios || propiedad.dormitorios >= dormitorios;
-
-        return coincideTipo && coincideComuna && coincidePrecio && coincideDormitorios;
-    });
-}
 
 export default function Propiedades() {
     const { user } = useAuth();
     const { propiedades } = usePropiedades();
+    const { propietarios } = usePropietarios();
     const [filtros, setFiltros] = useState(filtrosIniciales);
     const [filtrosAplicados, setFiltrosAplicados] = useState(filtrosIniciales);
     const [mensaje, setMensaje] = useState({ texto: '', tipo: 'success' });
 
+    const propietarioLogueado = useMemo(() => {
+        if (!user) return null;
+        return propietarios.find((item) => item.usuarioId === user.id) || null;
+    }, [propietarios, user]);
+
+    const basePropiedades = useMemo(() => {
+        if (user?.rol === 'propietario' && propietarioLogueado) {
+            return propiedades.filter((item) => item.propietarioId === propietarioLogueado.id);
+        }
+        return propiedades;
+    }, [propiedades, propietarioLogueado, user]);
+
     const resultados = useMemo(
-        () => filtrarPropiedades(propiedades, filtrosAplicados),
-        [propiedades, filtrosAplicados]
+        () => filtrarPropiedades(basePropiedades, filtrosAplicados),
+        [basePropiedades, filtrosAplicados]
     );
 
     const puedeGestionar = user && ROLES_GESTION.includes(user.rol);
@@ -53,7 +53,7 @@ export default function Propiedades() {
         event.preventDefault();
         setFiltrosAplicados({ ...filtros });
 
-        const lista = filtrarPropiedades(propiedades, filtros);
+        const lista = filtrarPropiedades(basePropiedades, filtros);
 
         if (lista.length) {
             setMensaje({
@@ -66,6 +66,12 @@ export default function Propiedades() {
                 tipo: 'error'
             });
         }
+    };
+
+    const limpiarFiltros = () => {
+        setFiltros(filtrosIniciales);
+        setFiltrosAplicados(filtrosIniciales);
+        setMensaje({ texto: '', tipo: 'success' });
     };
 
     return (
@@ -113,13 +119,27 @@ export default function Propiedades() {
                     </div>
 
                     <div className="grupo-filtro">
-                        <label htmlFor="filtro-precio">Precio Máximo ($)</label>
+                        <label htmlFor="filtro-precio-min">Precio mínimo ($)</label>
                         <input
                             type="number"
-                            id="filtro-precio"
-                            name="precio"
-                            placeholder="Ej: 600000"
-                            value={filtros.precio}
+                            id="filtro-precio-min"
+                            name="precioMin"
+                            min="0"
+                            placeholder="Ej: 300000"
+                            value={filtros.precioMin}
+                            onChange={handleChange}
+                        />
+                    </div>
+
+                    <div className="grupo-filtro">
+                        <label htmlFor="filtro-precio-max">Precio máximo ($)</label>
+                        <input
+                            type="number"
+                            id="filtro-precio-max"
+                            name="precioMax"
+                            min="0"
+                            placeholder="Ej: 800000"
+                            value={filtros.precioMax}
                             onChange={handleChange}
                         />
                     </div>
@@ -136,12 +156,37 @@ export default function Propiedades() {
                             <option value="1">1+</option>
                             <option value="2">2+</option>
                             <option value="3">3+</option>
+                            <option value="4">4+</option>
                         </select>
                     </div>
 
-                    <button type="submit" className="boton boton-filtrar">
-                        Buscar
-                    </button>
+                    <div className="grupo-filtro">
+                        <label htmlFor="filtro-banos">Baños</label>
+                        <select
+                            id="filtro-banos"
+                            name="banos"
+                            value={filtros.banos}
+                            onChange={handleChange}
+                        >
+                            <option value="">Cualquiera</option>
+                            <option value="1">1+</option>
+                            <option value="2">2+</option>
+                            <option value="3">3+</option>
+                        </select>
+                    </div>
+
+                    <div className="grupo-filtro acciones-filtros">
+                        <button type="submit" className="boton boton-filtrar">
+                            Buscar
+                        </button>
+                        <button
+                            type="button"
+                            className="boton boton-filtrar boton-secundario"
+                            onClick={limpiarFiltros}
+                        >
+                            Limpiar
+                        </button>
+                    </div>
                 </form>
                 <Mensaje texto={mensaje.texto} tipo={mensaje.tipo} />
             </section>

@@ -1,5 +1,6 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ESTADOS_PROPIEDAD, IMAGEN_DEFECTO, TIPOS_PROPIEDAD } from '../data/propiedades';
+import { usePropietarios } from '../context/PropietariosContext';
 import Mensaje from './Mensaje';
 
 const valoresPorDefecto = {
@@ -9,9 +10,13 @@ const valoresPorDefecto = {
     direccion: '',
     ubicacion: '',
     precioMensual: '',
+    gastosComunes: '0',
     dormitorios: '0',
     banos: '1',
+    estacionamientos: '0',
     superficie: '',
+    caracteristicas: '',
+    propietarioId: '',
     estado: 'Disponible',
     imagen: ''
 };
@@ -24,20 +29,44 @@ function normalizar(valores) {
         comuna: String(base.comuna ?? ''),
         direccion: String(base.direccion ?? ''),
         ubicacion: String(base.ubicacion ?? ''),
-        precioMensual: base.precioMensual === '' || base.precioMensual == null ? '' : String(base.precioMensual),
+        precioMensual:
+            base.precioMensual === '' || base.precioMensual == null
+                ? ''
+                : String(base.precioMensual),
+        gastosComunes:
+            base.gastosComunes === '' || base.gastosComunes == null
+                ? '0'
+                : String(base.gastosComunes),
         dormitorios: String(base.dormitorios ?? '0'),
         banos: String(base.banos ?? '1'),
-        superficie: base.superficie === '' || base.superficie == null ? '' : String(base.superficie),
+        estacionamientos:
+            base.estacionamientos === '' || base.estacionamientos == null
+                ? '0'
+                : String(base.estacionamientos),
+        superficie:
+            base.superficie === '' || base.superficie == null ? '' : String(base.superficie),
+        caracteristicas: Array.isArray(base.caracteristicas)
+            ? base.caracteristicas.join(', ')
+            : String(base.caracteristicas ?? ''),
+        propietarioId:
+            base.propietarioId === '' || base.propietarioId == null
+                ? ''
+                : String(base.propietarioId),
         estado: base.estado || 'Disponible',
         imagen: String(base.imagen ?? '')
     };
 }
 
 export default function PropiedadForm({ valoresIniciales, onSubmit, textoBoton = 'Guardar' }) {
+    const { propietarios } = usePropietarios();
     const [form, setForm] = useState(() => normalizar(valoresIniciales));
     const [mensaje, setMensaje] = useState('');
     const [erroresCampo, setErroresCampo] = useState({});
     const formRef = useRef(null);
+
+    useEffect(() => {
+        setForm(() => normalizar(valoresIniciales));
+    }, [valoresIniciales]);
 
     const handleChange = (event) => {
         const { name, value } = event.target;
@@ -76,6 +105,11 @@ export default function PropiedadForm({ valoresIniciales, onSubmit, textoBoton =
             errores.superficie = 'Ingresa una superficie válida en m².';
         }
 
+        const gastosComunes = Number(form.gastosComunes) || 0;
+        if (gastosComunes < 0) {
+            errores.gastosComunes = 'Los gastos comunes no pueden ser negativos.';
+        }
+
         if (Object.keys(errores).length > 0) {
             setErroresCampo(errores);
             setMensaje('Revisa los campos marcados.');
@@ -85,6 +119,12 @@ export default function PropiedadForm({ valoresIniciales, onSubmit, textoBoton =
 
         setErroresCampo({});
         setMensaje('');
+
+        const caracteristicas = form.caracteristicas
+            .split(',')
+            .map((item) => item.trim())
+            .filter(Boolean);
+
         onSubmit({
             titulo: form.titulo.trim(),
             tipo: form.tipo,
@@ -92,9 +132,13 @@ export default function PropiedadForm({ valoresIniciales, onSubmit, textoBoton =
             direccion: form.direccion.trim(),
             ubicacion: form.ubicacion.trim() || `${form.comuna.trim()}, Santiago`,
             precioMensual: precio,
+            gastosComunes,
             dormitorios: Number(form.dormitorios) || 0,
             banos: Number(form.banos) || 0,
+            estacionamientos: Number(form.estacionamientos) || 0,
             superficie,
+            caracteristicas,
+            propietarioId: form.propietarioId ? Number(form.propietarioId) : null,
             estado: form.estado,
             imagen: form.imagen.trim() || IMAGEN_DEFECTO
         });
@@ -216,6 +260,26 @@ export default function PropiedadForm({ valoresIniciales, onSubmit, textoBoton =
             </div>
 
             <div className="campo">
+                <label htmlFor="gastosComunes">Gastos comunes ($)</label>
+                <input
+                    type="number"
+                    id="gastosComunes"
+                    name="gastosComunes"
+                    min="0"
+                    placeholder="Ej: 80000"
+                    value={form.gastosComunes}
+                    onChange={handleChange}
+                    aria-invalid={erroresCampo.gastosComunes ? 'true' : undefined}
+                    aria-describedby={erroresCampo.gastosComunes ? 'gastosComunes-error' : undefined}
+                />
+                {erroresCampo.gastosComunes && (
+                    <span id="gastosComunes-error" className="error-campo">
+                        {erroresCampo.gastosComunes}
+                    </span>
+                )}
+            </div>
+
+            <div className="campo">
                 <label htmlFor="superficie">Superficie (m²)</label>
                 <input
                     type="number"
@@ -256,6 +320,47 @@ export default function PropiedadForm({ valoresIniciales, onSubmit, textoBoton =
                     name="banos"
                     min="0"
                     value={form.banos}
+                    onChange={handleChange}
+                />
+            </div>
+
+            <div className="campo">
+                <label htmlFor="estacionamientos">Estacionamientos</label>
+                <input
+                    type="number"
+                    id="estacionamientos"
+                    name="estacionamientos"
+                    min="0"
+                    value={form.estacionamientos}
+                    onChange={handleChange}
+                />
+            </div>
+
+            <div className="campo">
+                <label htmlFor="propietarioId">Propietario</label>
+                <select
+                    id="propietarioId"
+                    name="propietarioId"
+                    value={form.propietarioId}
+                    onChange={handleChange}
+                >
+                    <option value="">Sin propietario asignado</option>
+                    {propietarios.map((dueno) => (
+                        <option key={dueno.id} value={dueno.id}>
+                            {dueno.nombre}
+                        </option>
+                    ))}
+                </select>
+            </div>
+
+            <div className="campo campo-completo">
+                <label htmlFor="caracteristicas">Características (separadas por coma)</label>
+                <input
+                    type="text"
+                    id="caracteristicas"
+                    name="caracteristicas"
+                    placeholder="Ej: Amueblado, Balcón, Calefacción"
+                    value={form.caracteristicas}
                     onChange={handleChange}
                 />
             </div>

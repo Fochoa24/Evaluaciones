@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { ROLES_ATENCION, ROLES_GESTION } from '../data/roles';
+import { ROLES_ATENCION, ROLES_EVALUAN, ROLES_GESTION } from '../data/roles';
 
 const ETIQUETAS_ROL = {
     admin: 'Administrador',
@@ -157,6 +157,21 @@ export default function Header() {
                                         {ROLES_ATENCION.includes(user.rol) && (
                                             <Link to="/visitas" role="menuitem" onClick={cerrarMenus}>
                                                 <span aria-hidden="true">📅</span> Solicitudes de visita
+                                            </Link>
+                                        )}
+                                        {ROLES_EVALUAN.includes(user.rol) && (
+                                            <Link to="/arriendos" role="menuitem" onClick={cerrarMenus}>
+                                                <span aria-hidden="true">📝</span> Solicitudes de arriendo
+                                            </Link>
+                                        )}
+                                        {ROLES_GESTION.includes(user.rol) && (
+                                            <Link to="/propietarios" role="menuitem" onClick={cerrarMenus}>
+                                                <span aria-hidden="true">👤</span> Propietarios
+                                            </Link>
+                                        )}
+                                        {ROLES_ATENCION.includes(user.rol) && (
+                                            <Link to="/clientes" role="menuitem" onClick={cerrarMenus}>
+                                                <span aria-hidden="true">👥</span> Clientes interesados
                                             </Link>
                                         )}
 

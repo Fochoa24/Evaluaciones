@@ -1,14 +1,24 @@
+/**
+ * Catálogo semilla de inmuebles del caso Gestión Inmobiliaria.
+ * Cada propiedad incluye campos RF3: gastos, estacionamientos,
+ * características y propietario asociado.
+ */
 export const propiedades = [
     {
         id: 1,
         tipo: 'Departamento',
         titulo: 'Departamento Amueblado en Av. Italia',
         comuna: 'Providencia',
+        direccion: 'Av. Italia 1234',
         ubicacion: 'Providencia, Santiago',
         precioMensual: 550000,
+        gastosComunes: 80000,
         dormitorios: 2,
         banos: 2,
+        estacionamientos: 1,
         superficie: 65,
+        caracteristicas: ['Amueblado', 'Balcón', 'Calefacción'],
+        propietarioId: 1,
         estado: 'Disponible',
         imagen: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=600&q=80'
     },
@@ -17,11 +27,16 @@ export const propiedades = [
         tipo: 'Casa',
         titulo: 'Casa Familiar con Jardín y Piscina',
         comuna: 'Las Condes',
+        direccion: 'Los Leones 456',
         ubicacion: 'Las Condes, Santiago',
         precioMensual: 1200000,
+        gastosComunes: 120000,
         dormitorios: 4,
         banos: 3,
+        estacionamientos: 2,
         superficie: 180,
+        caracteristicas: ['Jardín', 'Piscina', 'Quincho'],
+        propietarioId: 2,
         estado: 'Disponible',
         imagen: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=600&q=80'
     },
@@ -30,11 +45,16 @@ export const propiedades = [
         tipo: 'Oficina',
         titulo: 'Oficina Comercial en Sector El Golf',
         comuna: 'Las Condes',
+        direccion: 'Apoquindo 789',
         ubicacion: 'Las Condes, Santiago',
         precioMensual: 480000,
-        dormitorios: 2,
+        gastosComunes: 60000,
+        dormitorios: 1,
         banos: 1,
+        estacionamientos: 1,
         superficie: 45,
+        caracteristicas: ['Sala de reuniones', 'Vigilancia'],
+        propietarioId: 3,
         estado: 'Disponible',
         imagen: 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=600&q=80'
     },
@@ -43,11 +63,16 @@ export const propiedades = [
         tipo: 'Local comercial',
         titulo: 'Local Comercial a Pie de Calle',
         comuna: 'Santiago Centro',
+        direccion: 'Ahumada 100',
         ubicacion: 'Santiago Centro, Santiago',
         precioMensual: 850000,
+        gastosComunes: 100000,
         dormitorios: 0,
         banos: 2,
+        estacionamientos: 0,
         superficie: 90,
+        caracteristicas: ['Vitrina', 'Bodega'],
+        propietarioId: 1,
         estado: 'Reservada',
         imagen: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80'
     },
@@ -56,11 +81,16 @@ export const propiedades = [
         tipo: 'Departamento',
         titulo: 'Departamento con Vista al Cerro',
         comuna: 'Ñuñoa',
+        direccion: 'Manquehue Sur 321',
         ubicacion: 'Ñuñoa, Santiago',
         precioMensual: 620000,
+        gastosComunes: 75000,
         dormitorios: 3,
         banos: 2,
+        estacionamientos: 1,
         superficie: 72,
+        caracteristicas: ['Vista panorámica', 'Estacionamiento techado'],
+        propietarioId: 2,
         estado: 'Disponible',
         imagen: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=600&q=80'
     },
@@ -69,21 +99,137 @@ export const propiedades = [
         tipo: 'Casa',
         titulo: 'Casa Moderna en Barrio Alto',
         comuna: 'Vitacura',
+        direccion: 'San Sebastián 555',
         ubicacion: 'Vitacura, Santiago',
         precioMensual: 1500000,
+        gastosComunes: 150000,
         dormitorios: 5,
         banos: 4,
+        estacionamientos: 3,
         superficie: 220,
+        caracteristicas: ['Terraza', 'Domótica', 'Gimnasio'],
+        propietarioId: 3,
         estado: 'Publicada',
         imagen: 'https://images.unsplash.com/photo-1576941089067-2de3c901e126?auto=format&fit=crop&w=600&q=80'
+    },
+    {
+        id: 7,
+        tipo: 'Departamento',
+        titulo: 'Studio Céntrico Cerro Santa Lucía',
+        comuna: 'Santiago Centro',
+        direccion: 'Santa Lucía 450',
+        ubicacion: 'Santiago Centro, Santiago',
+        precioMensual: 390000,
+        gastosComunes: 55000,
+        dormitorios: 1,
+        banos: 1,
+        estacionamientos: 0,
+        superficie: 38,
+        caracteristicas: ['Estudio', 'Cerca del metro'],
+        propietarioId: 4,
+        estado: 'Disponible',
+        imagen: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=600&q=80'
+    },
+    {
+        id: 8,
+        tipo: 'Casa',
+        titulo: 'Casa Patio en La Reina',
+        comuna: 'La Reina',
+        direccion: 'Av. Príncipe de Gales 900',
+        ubicacion: 'La Reina, Santiago',
+        precioMensual: 980000,
+        gastosComunes: 90000,
+        dormitorios: 3,
+        banos: 2,
+        estacionamientos: 2,
+        superficie: 140,
+        caracteristicas: ['Patio', 'Quincho', 'Bodega'],
+        propietarioId: 4,
+        estado: 'Arrendada',
+        imagen: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=600&q=80'
+    },
+    {
+        id: 9,
+        tipo: 'Departamento',
+        titulo: 'Departamento Familiar en Maipú',
+        comuna: 'Maipú',
+        direccion: 'Av. 5 de Abril 2100',
+        ubicacion: 'Maipú, Santiago',
+        precioMensual: 450000,
+        gastosComunes: 65000,
+        dormitorios: 2,
+        banos: 1,
+        estacionamientos: 1,
+        superficie: 58,
+        caracteristicas: ['Cerca del metro', 'Ascensor'],
+        propietarioId: 5,
+        estado: 'Disponible',
+        imagen: 'https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&w=600&q=80'
+    },
+    {
+        id: 10,
+        tipo: 'Oficina',
+        titulo: 'Coworking Amplio en Ñuñoa',
+        comuna: 'Ñuñoa',
+        direccion: 'Av. Irarrázaval 3300',
+        ubicacion: 'Ñuñoa, Santiago',
+        precioMensual: 720000,
+        gastosComunes: 110000,
+        dormitorios: 0,
+        banos: 2,
+        estacionamientos: 2,
+        superficie: 110,
+        caracteristicas: ['Open space', 'Sala juntas', 'Fibra óptica'],
+        propietarioId: 5,
+        estado: 'En mantención',
+        imagen: 'https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=600&q=80'
+    },
+    {
+        id: 11,
+        tipo: 'Local comercial',
+        titulo: 'Oficina Vitrina en Providencia',
+        comuna: 'Providencia',
+        direccion: 'Manuel Montt 800',
+        ubicacion: 'Providencia, Santiago',
+        precioMensual: 1100000,
+        gastosComunes: 140000,
+        dormitorios: 0,
+        banos: 2,
+        estacionamientos: 1,
+        superficie: 95,
+        caracteristicas: ['Vitrina', 'Auditorio', 'Bodega subterránea'],
+        propietarioId: 3,
+        estado: 'Disponible',
+        imagen: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=600&q=80'
+    },
+    {
+        id: 12,
+        tipo: 'Departamento',
+        titulo: 'Departamento Playa en Viña (sucursal)',
+        comuna: 'Viña del Mar',
+        direccion: 'Av. Argentina 1500',
+        ubicacion: 'Viña del Mar, Valparaíso',
+        precioMensual: 780000,
+        gastosComunes: 95000,
+        dormitorios: 2,
+        banos: 2,
+        estacionamientos: 1,
+        superficie: 70,
+        caracteristicas: ['Vista mar', 'Piscina edificio', 'Amueblado'],
+        propietarioId: 2,
+        estado: 'Publicada',
+        imagen: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=600&q=80'
     }
 ];
 
+/** Imagen de respaldo cuando no hay URL válida. */
 export const IMAGEN_DEFECTO =
     'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=600&q=80';
 
+/** Tipos de inmueble soportados por el formulario y los filtros. */
 export const TIPOS_PROPIEDAD = ['Departamento', 'Casa', 'Oficina', 'Local comercial'];
 
+/** Estados del ciclo de vida de una propiedad (RF del caso). */
 export const ESTADOS_PROPIEDAD = [
     'Disponible',
     'Publicada',
@@ -93,6 +239,7 @@ export const ESTADOS_PROPIEDAD = [
     'Inactiva'
 ];
 
+/** Mapa clave del filtro (slug) → valor del catálogo. */
 export const tipoMap = {
     departamento: 'Departamento',
     casa: 'Casa',

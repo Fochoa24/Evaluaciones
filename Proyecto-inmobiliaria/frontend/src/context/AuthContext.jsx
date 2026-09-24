@@ -1,6 +1,12 @@
 import { createContext, useContext, useState } from 'react';
 import { eliminar, guardar, leer } from '../services/storage';
 
+/**
+ * Contexto de autenticación y usuarios demo.
+ * Expone la sesión actual (`user`), el listado de usuarios y las
+ * operaciones login / registrar / logout. La sesión se guarda en
+ * localStorage (`gi_sesion`) sin el password.
+ */
 const AuthContext = createContext(null);
 
 const usuariosSemilla = [
@@ -42,6 +48,11 @@ const usuariosSemilla = [
     }
 ];
 
+/**
+ * Devuelve el usuario sin password para persistir la sesión.
+ * @param {object|null} usuario - Usuario completo o null.
+ * @returns {object|null} Copia sin `password`.
+ */
 function sinPassword(usuario) {
     if (!usuario) {
         return null;
@@ -75,6 +86,11 @@ export function AuthProvider({ children }) {
         setUser(sesion);
     };
 
+    /**
+     * Valida credenciales y perfil; inicia sesión si coinciden.
+     * @param {{usuario: string, password: string, perfil: string}} credenciales
+     * @returns {{ok: boolean, mensaje: string}}
+     */
     const login = ({ usuario, password, perfil }) => {
         if (!usuario || !password || !perfil) {
             return { ok: false, mensaje: 'Completa todos los campos antes de ingresar.' };
@@ -110,6 +126,11 @@ export function AuthProvider({ children }) {
         return { ok: true, mensaje: `Bienvenido ${encontrado.usuario}. Redirigiendo al panel...` };
     };
 
+    /**
+     * Crea una cuenta, la guarda e inicia sesión automáticamente.
+     * @param {{nombre: string, usuario: string, email: string, password: string, telefono?: string, rol?: string}} datos
+     * @returns {{ok: boolean, mensaje: string}}
+     */
     const registrar = ({ nombre, usuario, email, password, telefono, rol }) => {
         if (!nombre || !usuario || !email || !password) {
             return { ok: false, mensaje: 'Completa todos los campos obligatorios.' };

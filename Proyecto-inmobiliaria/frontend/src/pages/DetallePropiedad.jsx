@@ -4,6 +4,7 @@ import Badge from '../components/Badge';
 import Mensaje from '../components/Mensaje';
 import { useAuth } from '../context/AuthContext';
 import { usePropiedades } from '../context/PropiedadesContext';
+import { usePropietarios } from '../context/PropietariosContext';
 import { useVisitas } from '../context/VisitasContext';
 import { ROLES_GESTION } from '../data/roles';
 
@@ -21,10 +22,14 @@ export default function DetallePropiedad() {
     const navigate = useNavigate();
     const { user } = useAuth();
     const { obtener, eliminar } = usePropiedades();
+    const { propietarios } = usePropietarios();
     const { crear } = useVisitas();
     const formRef = useRef(null);
 
     const propiedad = obtener(id);
+    const dueno = propiedad
+        ? propietarios.find((item) => item.id === propiedad.propietarioId)
+        : null;
     const puedeGestionar = user && ROLES_GESTION.includes(user.rol);
     const hoy = new Date().toISOString().split('T')[0];
 
@@ -46,6 +51,9 @@ export default function DetallePropiedad() {
             </main>
         );
     }
+
+    const puedeArrendar =
+        propiedad.estado === 'Disponible' || propiedad.estado === 'Publicada';
 
     const handleChange = (event) => {
         const { name, value } = event.target;
@@ -87,7 +95,7 @@ export default function DetallePropiedad() {
         }
 
         setErroresCampo({});
-        crear({
+        const resultado = crear({
             propiedadId: propiedad.id,
             propiedadTitulo: propiedad.titulo,
             nombre: solicitud.nombre.trim(),
@@ -97,6 +105,11 @@ export default function DetallePropiedad() {
             hora: solicitud.hora,
             comentarios: solicitud.comentarios.trim()
         });
+
+        if (!resultado.ok) {
+            setMensaje({ texto: resultado.mensaje, tipo: 'error' });
+            return;
+        }
 
         setMensaje({
             texto: 'Solicitud de visita registrada. Te contactaremos para confirmar.',
@@ -111,6 +124,8 @@ export default function DetallePropiedad() {
             navigate('/propiedades');
         }
     };
+
+    const totalAPagar = propiedad.precioMensual + (propiedad.gastosComunes || 0);
 
     return (
         <main className="seccion detalle-main">
@@ -138,15 +153,45 @@ export default function DetallePropiedad() {
                                 {propiedad.direccion || 'Sin dirección registrada'}
                             </li>
                             <li>
-                                <span aria-hidden="true">🛏️</span> Dormitorios: {propiedad.dormitorios}
+                                <span aria-hidden="true">🛏️</span> Dormitorios:{' '}
+                                {propiedad.dormitorios}
                             </li>
                             <li>
                                 <span aria-hidden="true">🚿</span> Baños: {propiedad.banos}
                             </li>
                             <li>
-                                <span aria-hidden="true">📐</span> Superficie: {propiedad.superficie} m²
+                                <span aria-hidden="true">🅿️</span> Estacionamientos:{' '}
+                                {propiedad.estacionamientos ?? 0}
                             </li>
+                            <li>
+                                <span aria-hidden="true">📐</span> Superficie:{' '}
+                                {propiedad.superficie} m²
+                            </li>
+                            <li>
+                                <span aria-hidden="true">🧾</span> Gastos comunes:${' '}
+                                {(propiedad.gastosComunes || 0).toLocaleString('es-CL')}
+                            </li>
+                            <li>
+                                <span aria-hidden="true">💰</span> Total mensual estimado:${' '}
+                                {totalAPagar.toLocaleString('es-CL')}
+                            </li>
+                            {dueno && (
+                                <li>
+                                    <span aria-hidden="true">👤</span> Propietario: {dueno.nombre}
+                                </li>
+                            )}
                         </ul>
+
+                        {propiedad.caracteristicas?.length ? (
+                            <div className="caracteristicas-propiedad">
+                                <h2>Características</h2>
+                                <ul>
+                                    {propiedad.caracteristicas.map((item) => (
+                                        <li key={item}>{item}</li>
+                                    ))}
+                                </ul>
+                            </div>
+                        ) : null}
 
                         <div className="acciones-detalle">
                             <Link to="/propiedades" className="boton boton-ver">
@@ -154,7 +199,10 @@ export default function DetallePropiedad() {
                             </Link>
                             {puedeGestionar && (
                                 <>
-                                    <Link to={`/propiedades/${propiedad.id}/editar`} className="boton boton-ver">
+                                    <Link
+                                        to={`/propiedades/${propiedad.id}/editar`}
+                                        className="boton boton-ver"
+                                    >
                                         Editar
                                     </Link>
                                     <button
@@ -167,6 +215,14 @@ export default function DetallePropiedad() {
                                 </>
                             )}
                         </div>
+
+                        {puedeArrendar && (
+                            <div className="acciones-detalle">
+                                <Link to={`/arriendos/nueva/${propiedad.id}`} className="boton">
+                                    Solicitar arriendo
+                                </Link>
+                            </div>
+                        )}
                     </div>
                 </article>
             </section>
@@ -195,7 +251,9 @@ export default function DetallePropiedad() {
                             required
                             autoComplete="name"
                             aria-invalid={erroresCampo.nombre ? 'true' : undefined}
-                            aria-describedby={erroresCampo.nombre ? 'nombre-visita-error' : undefined}
+                            aria-describedby={
+                                erroresCampo.nombre ? 'nombre-visita-error' : undefined
+                            }
                         />
                         {erroresCampo.nombre && (
                             <span id="nombre-visita-error" className="error-campo">
@@ -215,7 +273,9 @@ export default function DetallePropiedad() {
                             required
                             autoComplete="email"
                             aria-invalid={erroresCampo.email ? 'true' : undefined}
-                            aria-describedby={erroresCampo.email ? 'email-visita-error' : undefined}
+                            aria-describedby={
+                                erroresCampo.email ? 'email-visita-error' : undefined
+                            }
                         />
                         {erroresCampo.email && (
                             <span id="email-visita-error" className="error-campo">

@@ -1,5 +1,16 @@
+/**
+ * Cookies de preferencias con prefijo `gu_` (consentimiento de cookies).
+ * Se usan cookies en lugar de localStorage porque el banner de cookies
+ * debe sobrevivir a un borrado selectivo de datos de sitio.
+ */
+
 const PREFIJO_COOKIE = 'gu_';
 
+/**
+ * Obtiene el valor de una cookie de preferencias.
+ * @param {string} nombre - Nombre sin prefijo (ej: 'consentimiento').
+ * @returns {string|null} Valor decodificado o null.
+ */
 export function obtenerCookie(nombre) {
     if (typeof document === 'undefined') {
         return null;
@@ -17,6 +28,12 @@ export function obtenerCookie(nombre) {
     return decodeURIComponent(parte.slice(prefijo.length));
 }
 
+/**
+ * Define una cookie de preferencias (sameSite=Lax, path=/).
+ * @param {string} nombre - Nombre sin prefijo.
+ * @param {string} valor - Valor a codificar.
+ * @param {number} [dias=180] - Vigencia en días.
+ */
 export function definirCookie(nombre, valor, dias = 180) {
     if (typeof document === 'undefined') {
         return;
@@ -26,6 +43,10 @@ export function definirCookie(nombre, valor, dias = 180) {
     document.cookie = `${PREFIJO_COOKIE}${nombre}=${encodeURIComponent(valor)}; expires=${expira}; path=/; sameSite=Lax`;
 }
 
+/**
+ * Elimina una cookie de preferencias (expiración en el pasado).
+ * @param {string} nombre - Nombre sin prefijo.
+ */
 export function borrarCookie(nombre) {
     if (typeof document === 'undefined') {
         return;

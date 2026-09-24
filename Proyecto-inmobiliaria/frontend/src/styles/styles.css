@@ -1889,6 +1889,71 @@ tbody th {
     color: #b3392f;
 }
 
+.boton-secundario {
+    background-color: transparent;
+    border: 2px solid var(--verde);
+    color: var(--verde);
+}
+
+.boton-secundario:hover {
+    background-color: var(--verde);
+    border-color: var(--verde);
+    color: var(--blanco);
+}
+
+.boton-mini:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+}
+
+.acciones-filtros {
+    align-items: flex-end;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.edicion-visita {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 180px;
+}
+
+.edicion-visita input,
+.edicion-visita select {
+    border: 1px solid var(--gris);
+    border-radius: 6px;
+    font: inherit;
+    padding: 6px 8px;
+}
+
+.caracteristicas-propiedad {
+    margin-top: 16px;
+}
+
+.caracteristicas-propiedad h2 {
+    color: var(--verde-oscuro);
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+}
+
+.caracteristicas-propiedad ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    list-style: none;
+}
+
+.caracteristicas-propiedad li {
+    background-color: var(--verde-claro);
+    border-radius: 999px;
+    color: var(--verde-oscuro);
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 6px 12px;
+}
+
 .enlace-registro {
     color: var(--gris);
     font-size: 0.9rem;
