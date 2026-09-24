@@ -27,6 +27,11 @@ export default function Terminos() {
             <p>
                 Las cuentas de demostración son solo para pruebas y pueden modificarse o eliminarse.
             </p>
+            <p>
+                Las propiedades, visitas agendadas, reservas y solicitudes de arriendo incluidas en
+                la plataforma son <strong>datos ficticios</strong> para fines educativos y no generan
+                obligaciones contractuales reales.
+            </p>
 
             <h2>4. Uso permitido</h2>
             <p>Te comprometes a:</p>

@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { ESTADOS_PROPIETARIO } from '../data/propietarios';
-import { usePropietarios } from '../context/PropietariosContext';
-import { usePropiedades } from '../context/PropiedadesContext';
+import AvisoFicticio from '../components/AvisoFicticio';
 import Mensaje from '../components/Mensaje';
+import { usePropiedades } from '../context/PropiedadesContext';
+import { usePropietarios } from '../context/PropietariosContext';
+import { ESTADOS_PROPIETARIO } from '../data/propietarios';
 
 const formularioInicial = {
     nombre: '',
@@ -105,6 +106,7 @@ export default function Propietarios() {
                 <p className="subtitulo-login">
                     Administra los dueños de los inmuebles y asócialos a cada propiedad.
                 </p>
+                <AvisoFicticio texto="Los propietarios precargados son ficticios y solo sirven para probar el CRUD y el filtrado del catálogo." />
             </section>
 
             <section className="tarjeta-form">

@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import AvisoFicticio from '../components/AvisoFicticio';
 import { useArriendos } from '../context/ArriendosContext';
 import { useAuth } from '../context/AuthContext';
 import { usePropiedades } from '../context/PropiedadesContext';
@@ -222,6 +223,7 @@ export default function Arriendos() {
                 <p className="subtitulo-login">
                     Evalúa antecedentes, aprueba (reserva la propiedad), rechaza o libera reservas.
                 </p>
+                <AvisoFicticio texto="Las reservas y solicitudes aprobadas son ficticias: existen solo para demostrar el flujo de evaluación del caso." />
             </section>
 
             {mensaje.texto && (

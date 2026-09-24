@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import AvisoFicticio from '../components/AvisoFicticio';
 import { useVisitas } from '../context/VisitasContext';
 import { ESTADOS_VISITA, RESULTADOS_VISITA } from '../data/flujo';
 
@@ -187,6 +188,7 @@ export default function Visitas() {
                     Confirma, rechaza, reprograma o cierra visitas. El sistema evita superposiciones
                     de horario en la agenda.
                 </p>
+                <AvisoFicticio texto="Las citas agendadas que ves son de demostración y no corresponden a visitas reales de la inmobiliaria." />
             </section>
 
             {mensaje.texto && (

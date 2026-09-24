@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import AvisoFicticio from '../components/AvisoFicticio';
 import { useArriendos } from '../context/ArriendosContext';
 import { useVisitas } from '../context/VisitasContext';
 
@@ -73,6 +74,7 @@ export default function Clientes() {
                 <p className="subtitulo-login">
                     Personas que han solicitado visitas o arriendos, reunidas en una sola lista.
                 </p>
+                <AvisoFicticio texto="Los contactos listados se generan a partir de visitas y solicitudes ficticias de la demostración." />
             </section>
 
             <section className="contenedor-filtros" aria-label="Buscar clientes">

@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import AvisoFicticio from '../components/AvisoFicticio';
 import Mensaje from '../components/Mensaje';
 import PropiedadCard from '../components/PropiedadCard';
 import { useAuth } from '../context/AuthContext';
@@ -87,6 +88,8 @@ export default function Propiedades() {
                     </Link>
                 )}
             </section>
+
+            <AvisoFicticio texto="El inventario, precios y estados del catálogo son datos ficticios de demostración académica." />
 
             <section className="contenedor-filtros" aria-label="Filtros de búsqueda">
                 <form onSubmit={aplicarFiltros} className="bar-filtros" role="search">

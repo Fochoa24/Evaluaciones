@@ -5,15 +5,15 @@ import { visitasSemilla } from '../data/visitas';
 import { guardar, leer } from './storage';
 
 /**
- * Versión del set de datos de demo. Si sube, se reemplaza la semilla
- * en localStorage (sin tocar la sesión del usuario).
+ * Versión del set de datos ficticios de demo. Si sube, se reemplaza
+ * la semilla en localStorage (sin tocar la sesión del usuario).
  */
 export const VERSION_DATOS = 2;
 
 /**
  * Si la semilla local es anterior a VERSION_DATOS, la reemplaza.
- * Se ejecuta una vez al arrancar la app (main.jsx) para que los
- * contextos lean datos coherentes del primer render.
+ * Carga reservas, citas y arriendos ficticios exigidos por la
+ * evaluación. Se ejecuta una vez al arrancar (main.jsx).
  */
 export function prepararDatosDemo() {
     const version = leer('version_datos', 0);

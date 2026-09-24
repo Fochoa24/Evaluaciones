@@ -1,6 +1,7 @@
 /**
- * Solicitudes de arriendo de ejemplo (RF9–RF11).
- * Cubren los estados Pendiente, En evaluación, Aprobada y Rechazada.
+ * Solicitudes de arriendo ficticias (RF9–RF11).
+ * Cubren Pendiente, En evaluación, Aprobada (reserva) y Rechazada.
+ * Sirven solo para demostrar el flujo de evaluación del caso.
  */
 export const arriendosSemilla = [
     {

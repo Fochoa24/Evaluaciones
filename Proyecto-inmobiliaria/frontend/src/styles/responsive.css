@@ -98,6 +98,40 @@
         padding: 60px 7%;
     }
 
+    .tabla-wrap {
+        -webkit-overflow-scrolling: touch;
+        margin-inline: -4px;
+        padding-bottom: 4px;
+    }
+
+    .acciones-tabla {
+        flex-direction: column;
+        min-width: 110px;
+    }
+
+    .acciones-tabla .boton {
+        width: 100%;
+    }
+
+    .edicion-visita {
+        min-width: 140px;
+    }
+
+    th,
+    td {
+        padding: 10px 8px;
+    }
+
+    .aviso-ficticio {
+        font-size: 0.9rem;
+        padding: 10px 12px;
+    }
+
+    .dashboard-header .acciones-detalle .boton {
+        flex: 1 1 auto;
+        min-width: 140px;
+    }
+
     .hero h1 {
         max-width: 100%;
     }

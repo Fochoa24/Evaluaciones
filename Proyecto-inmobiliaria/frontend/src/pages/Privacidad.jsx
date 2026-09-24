@@ -24,6 +24,11 @@ export default function Privacidad() {
                 Actualmente estos datos se guardan en el <code>localStorage</code> del navegador
                 (modo local, sin backend). Cuando se conecte la API, se migrarán al servidor.
             </p>
+            <p>
+                Los registros de propiedades, visitas, reservas y arriendos precargados son{' '}
+                <strong>datos ficticios</strong> de demostración académica: no corresponden a
+                personas ni operaciones reales.
+            </p>
 
             <h2>3. Finalidad</h2>
             <ul>

@@ -1,6 +1,7 @@
 /**
- * Visitas de ejemplo para la demo (RF7).
- * Estados cubiertos: Pendiente, Confirmada, Rechazada, Realizada.
+ * Visitas ficticias de demostración (RF7).
+ * Estados cubiertos: Pendiente, Confirmada, Rechazada, Realizada, Cancelada.
+ * Ninguna cita representa un recorrido real de la inmobiliaria.
  */
 export const visitasSemilla = [
     {

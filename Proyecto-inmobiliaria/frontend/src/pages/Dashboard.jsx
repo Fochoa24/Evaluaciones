@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import AvisoFicticio from '../components/AvisoFicticio';
 import Badge from '../components/Badge';
 import { useArriendos } from '../context/ArriendosContext';
 import { useAuth } from '../context/AuthContext';
@@ -58,6 +59,7 @@ export default function Dashboard() {
             <section className="dashboard-header">
                 <p className="etiqueta">PANEL ADMINISTRATIVO</p>
                 <h1>Resumen del portafolio inmobiliario</h1>
+                <AvisoFicticio texto="Métricas, estados de propiedad y operaciones del panel provienen de datos de ejemplo (ficticios)." />
                 {puedeGestionar && (
                     <div className="acciones-detalle">
                         <Link to="/propiedades/nueva" className="boton boton-ver">
