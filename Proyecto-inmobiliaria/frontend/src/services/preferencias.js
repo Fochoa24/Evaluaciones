@@ -42,15 +42,3 @@ export function definirCookie(nombre, valor, dias = 180) {
     const expira = new Date(Date.now() + dias * 86400000).toUTCString();
     document.cookie = `${PREFIJO_COOKIE}${nombre}=${encodeURIComponent(valor)}; expires=${expira}; path=/; sameSite=Lax`;
 }
-
-/**
- * Elimina una cookie de preferencias (expiración en el pasado).
- * @param {string} nombre - Nombre sin prefijo.
- */
-export function borrarCookie(nombre) {
-    if (typeof document === 'undefined') {
-        return;
-    }
-
-    document.cookie = `${PREFIJO_COOKIE}${nombre}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`;
-}

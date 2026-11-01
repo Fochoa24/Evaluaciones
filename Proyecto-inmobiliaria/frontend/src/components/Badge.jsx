@@ -5,7 +5,11 @@ const CLASES = {
     'En mantención': 'reservada',
     Arrendada: 'vendida',
     Vendida: 'vendida',
-    Inactiva: 'vendida'
+    Inactiva: 'vendida',
+    // Estados de cuenta
+    Activo: 'disponible',
+    Pendiente: 'reservada',
+    Inactivo: 'vendida'
 };
 
 export default function Badge({ estado }) {

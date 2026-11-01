@@ -1,73 +1,65 @@
-import { createContext, useContext, useEffect, useState } from 'react';
-import { propiedades as propiedadesSemilla } from '../data/propiedades';
-import { guardar, leer } from '../services/storage';
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import { api, resultado } from '../services/api';
+import { useAuth } from './AuthContext';
 
 /**
- * Estado global del catálogo de propiedades (CRUD + persistencia).
- * Al montar, migra campos RF3 faltantes en datos antiguos de
- * localStorage (gastos, estacionamientos, características, dueño).
+ * Catálogo desde la API (/api/propiedades). El backend decide qué ve cada
+ * uno (público, dueño, internos) y agrega a cada propiedad `puedeEditar` y
+ * `transiciones` para saber qué acciones mostrar. Las operaciones recargan
+ * la lista y devuelven { ok, mensaje, datos }.
  */
 const PropiedadesContext = createContext(null);
 
-/**
- * Completa campos RF3 ausentes en semillas/versiones previas.
- * @param {object[]} lista - Propiedades crudas de storage.
- * @returns {object[]} Lista con defaults aplicados.
- */
-function migrarPropiedades(lista) {
-    return lista.map((item) => ({
-        gastosComunes: 0,
-        estacionamientos: 0,
-        caracteristicas: [],
-        propietarioId: null,
-        direccion: '',
-        ...item
-    }));
-}
-
 export function PropiedadesProvider({ children }) {
-    const [propiedades, setPropiedades] = useState(() => {
-        const guardadas = leer('propiedades', null);
-        if (guardadas) {
-            const migradas = migrarPropiedades(guardadas);
-            if (JSON.stringify(migradas) !== JSON.stringify(guardadas)) {
-                guardar('propiedades', migradas);
-            }
-            return migradas;
+    const { user } = useAuth();
+    const [propiedades, setPropiedades] = useState([]);
+    const [cargando, setCargando] = useState(true);
+    const [error, setError] = useState('');
+
+    const recargar = useCallback(async () => {
+        try {
+            setPropiedades(await api('/api/propiedades'));
+            setError('');
+        } catch (e) {
+            setError(e.message);
+        } finally {
+            setCargando(false);
         }
-        guardar('propiedades', propiedadesSemilla);
-        return propiedadesSemilla;
-    });
+    }, []);
 
+    // Lo visible depende de la sesión: recarga al iniciar o cerrar sesión.
     useEffect(() => {
-        guardar('propiedades', propiedades);
-    }, [propiedades]);
+        recargar();
+    }, [recargar, user?.id]);
 
-    /** @param {string|number} id - Id de la propiedad. */
-    const obtener = (id) => propiedades.find((item) => item.id === Number(id));
-
-    /** @param {object} datos - Payload del formulario. @returns {object} Nueva propiedad. */
-    const crear = (datos) => {
-        const id = propiedades.reduce((max, item) => Math.max(max, item.id), 0) + 1;
-        const nueva = { id, ...datos };
-        setPropiedades((prev) => [...prev, nueva]);
-        return nueva;
-    };
-
-    /** @param {string|number} id @param {object} datos - Campos a sobreescribir. */
-    const actualizar = (id, datos) => {
-        setPropiedades((prev) =>
-            prev.map((item) => (item.id === Number(id) ? { ...item, ...datos } : item))
-        );
+    /** Ejecuta una llamada y, si sale bien, recarga el catálogo. */
+    const operar = async (promesa) => {
+        const r = await resultado(promesa);
+        if (r.ok) await recargar();
+        return r;
     };
 
     /** @param {string|number} id */
-    const eliminar = (id) => {
-        setPropiedades((prev) => prev.filter((item) => item.id !== Number(id)));
-    };
+    const obtener = (id) => propiedades.find((item) => item.id === Number(id));
+
+    /** @param {object} datos - Payload de PropiedadForm. */
+    const crear = (datos) => operar(api('/api/propiedades', { method: 'POST', body: datos }));
+
+    /** @param {string|number} id @param {object} datos */
+    const actualizar = (id, datos) =>
+        operar(api(`/api/propiedades/${id}`, { method: 'PATCH', body: datos }));
+
+    /** @param {string|number} id @param {string} estado - Destino permitido (§5.1). */
+    const cambiarEstado = (id, estado) =>
+        operar(api(`/api/propiedades/${id}/estado`, { method: 'POST', body: { estado } }));
+
+    /** Borrado físico (solo admin, sin historial). @param {string|number} id */
+    const eliminar = (id) => operar(api(`/api/propiedades/${id}`, { method: 'DELETE' }));
 
     return (
-        <PropiedadesContext.Provider value={{ propiedades, obtener, crear, actualizar, eliminar }}>
+        <PropiedadesContext.Provider
+            value={{ propiedades, cargando, error, recargar, obtener, crear, actualizar, cambiarEstado, eliminar }}
+        >
             {children}
         </PropiedadesContext.Provider>
     );

@@ -1,107 +1,72 @@
-import { createContext, useContext, useEffect, useState } from 'react';
-import { visitasSemilla } from '../data/visitas';
-import { guardar, leer } from '../services/storage';
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import { api, resultado } from '../services/api';
+import { useAuth } from './AuthContext';
 
 /**
- * Agenda de visitas (RF7–RF8): estados, resultado post-visita y
- * detección de superposiciones de fecha+hora en la agenda.
+ * Visitas desde la API (/api/visitas). El backend filtra por rol (§8),
+ * valida la agenda (RN-01 a RN-05) y agrega a cada visita `transiciones` y
+ * `puedeReprogramar`. Las operaciones recargan la lista y devuelven
+ * { ok, mensaje, datos }.
  */
 const VisitasContext = createContext(null);
 
 export function VisitasProvider({ children }) {
-    const [visitas, setVisitas] = useState(() => {
-        const guardados = leer('visitas', null);
-        if (guardados) {
-            return guardados;
+    const { user } = useAuth();
+    const [visitas, setVisitas] = useState([]);
+    const [cargando, setCargando] = useState(false);
+    const [error, setError] = useState('');
+
+    // Sin sesión no hay lista que ver (agendar sí se puede).
+    const recargar = useCallback(async () => {
+        if (!user || user.estado !== 'Activo' || user.debeCambiarPassword) {
+            setVisitas([]);
+            return;
         }
-        guardar('visitas', visitasSemilla);
-        return visitasSemilla;
-    });
+        setCargando(true);
+        try {
+            setVisitas(await api('/api/visitas'));
+            setError('');
+        } catch (e) {
+            setError(e.message);
+        } finally {
+            setCargando(false);
+        }
+    }, [user]);
 
     useEffect(() => {
-        guardar('visitas', visitas);
-    }, [visitas]);
+        recargar();
+    }, [recargar]);
+
+    const operar = async (promesa) => {
+        const r = await resultado(promesa);
+        if (r.ok) await recargar();
+        return r;
+    };
+
+    /** @param {object} datos - propiedadId, nombre, email, telefono, fecha, hora, comentarios. */
+    const crear = (datos) => operar(api('/api/visitas', { method: 'POST', body: datos }));
+
+    /** @param {number} id @param {{fecha: string, hora: string}} horario */
+    const reprogramar = (id, horario) =>
+        operar(api(`/api/visitas/${id}`, { method: 'PATCH', body: horario }));
+
+    /** @param {number} id @param {string} estado @param {string} [resultadoVisita] - Para Realizada. */
+    const cambiarEstado = (id, estado, resultadoVisita) =>
+        operar(api(`/api/visitas/${id}/estado`, { method: 'POST', body: { estado, resultado: resultadoVisita } }));
+
+    /** Solo admin. @param {number} id */
+    const eliminar = (id) => operar(api(`/api/visitas/${id}`, { method: 'DELETE' }));
 
     /**
-     * Indica si otra visita activa ocupa el mismo día y hora.
-     * @param {{fecha: string, hora: string, excluirId?: number}} criterio
-     * @returns {boolean}
+     * Rango agendable y bloques libres del día (sin fecha: solo el rango).
+     * @returns {Promise<{ok: boolean, mensaje: string, datos?: {desde: string, hasta: string, bloques: string[]}}>}
      */
-    const hayConflicto = ({ fecha, hora, excluirId = null }) => {
-        return visitas.some(
-            (item) =>
-                item.id !== Number(excluirId) &&
-                item.fecha === fecha &&
-                item.hora === hora &&
-                ['Pendiente', 'Confirmada'].includes(item.estado)
-        );
-    };
-
-    /**
-     * Crea una solicitud si no hay conflicto de agenda.
-     * @param {object} datos - propiedadId, nombre, email, fecha, hora, ...
-     * @returns {{ok: boolean, mensaje: string, visita?: object}}
-     */
-    const crear = (datos) => {
-        if (hayConflicto(datos)) {
-            return {
-                ok: false,
-                mensaje: `Ya existe una visita programada el ${datos.fecha} a las ${datos.hora}. Elige otro horario.`
-            };
-        }
-
-        const id = visitas.reduce((max, item) => Math.max(max, item.id), 0) + 1;
-        const nueva = {
-            id,
-            estado: 'Pendiente',
-            resultado: '',
-            ejecutivoId: null,
-            creadaEn: new Date().toISOString(),
-            ...datos
-        };
-        setVisitas((prev) => [nueva, ...prev]);
-        return { ok: true, visita: nueva, mensaje: 'Solicitud de visita registrada.' };
-    };
-
-    /**
-     * Actualiza campos de una visita (reprogramar, resultado, ...).
-     * Valida conflicto si cambian fecha y hora.
-     * @param {string|number} id @param {object} datos
-     * @returns {{ok: boolean, mensaje: string}}
-     */
-    const actualizar = (id, datos) => {
-        if (datos.fecha && datos.hora) {
-            if (hayConflicto({ ...datos, excluirId: id })) {
-                return {
-                    ok: false,
-                    mensaje: 'Hay conflicto de horario con otra visita en esa fecha y hora.'
-                };
-            }
-        }
-        setVisitas((prev) =>
-            prev.map((item) => (item.id === Number(id) ? { ...item, ...datos } : item))
-        );
-        return { ok: true, mensaje: 'Visita actualizada.' };
-    };
-
-    /**
-     * Cambia el estado del flujo y/o guarda el resultado.
-     * @param {string|number} id @param {string} estado @param {object} [extras]
-     */
-    const actualizarEstado = (id, estado, extras = {}) => {
-        setVisitas((prev) =>
-            prev.map((item) => (item.id === Number(id) ? { ...item, estado, ...extras } : item))
-        );
-    };
-
-    /** @param {string|number} id */
-    const eliminar = (id) => {
-        setVisitas((prev) => prev.filter((item) => item.id !== Number(id)));
-    };
+    const horarios = (propiedadId, fecha = '') =>
+        resultado(api(`/api/propiedades/${propiedadId}/horarios${fecha ? `?fecha=${fecha}` : ''}`));
 
     return (
         <VisitasContext.Provider
-            value={{ visitas, crear, actualizar, actualizarEstado, eliminar, hayConflicto }}
+            value={{ visitas, cargando, error, recargar, crear, reprogramar, cambiarEstado, eliminar, horarios }}
         >
             {children}
         </VisitasContext.Provider>

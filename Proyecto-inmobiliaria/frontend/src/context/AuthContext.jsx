@@ -1,184 +1,98 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
+import { api, resultado } from '../services/api';
 import { eliminar, guardar, leer } from '../services/storage';
 
 /**
- * Contexto de autenticación y usuarios demo.
- * Expone la sesión actual (`user`), el listado de usuarios y las
- * operaciones login / registrar / logout. La sesión se guarda en
- * localStorage (`gi_sesion`) sin el password.
+ * Sesión contra la API (/api/auth). Guarda el JWT en `gi_token` y una copia
+ * del usuario en `gi_sesion` para no parpadear al recargar; al montar se
+ * refresca con /api/auth/yo, que refleja bajas o cambios de estado.
  */
 const AuthContext = createContext(null);
 
-const usuariosSemilla = [
-    {
-        id: 1,
-        usuario: 'admin',
-        nombre: 'Administrador',
-        email: 'admin@inmobiliaria.cl',
-        password: 'admin123',
-        telefono: '',
-        rol: 'admin'
-    },
-    {
-        id: 2,
-        usuario: 'ejecutivo',
-        nombre: 'Ejecutivo Inmobiliario',
-        email: 'ejecutivo@inmobiliaria.cl',
-        password: 'ejecutivo123',
-        telefono: '',
-        rol: 'ejecutivo'
-    },
-    {
-        id: 3,
-        usuario: 'propietario',
-        nombre: 'Propietario Demo',
-        email: 'propietario@inmobiliaria.cl',
-        password: 'propietario123',
-        telefono: '',
-        rol: 'propietario'
-    },
-    {
-        id: 4,
-        usuario: 'cliente',
-        nombre: 'Cliente Demo',
-        email: 'cliente@inmobiliaria.cl',
-        password: 'cliente123',
-        telefono: '',
-        rol: 'cliente'
-    }
-];
+// Restos de la versión local (antes de la API): cuentas con contraseña en texto
+// plano y copias de datos de negocio. Hoy solo se guarda la sesión.
+['usuarios', 'propiedades', 'propietarios', 'visitas', 'arriendos', 'version_datos'].forEach((clave) =>
+    eliminar(clave)
+);
 
-/**
- * Devuelve el usuario sin password para persistir la sesión.
- * @param {object|null} usuario - Usuario completo o null.
- * @returns {object|null} Copia sin `password`.
- */
-function sinPassword(usuario) {
-    if (!usuario) {
-        return null;
-    }
-    const { password, ...resto } = usuario;
-    return resto;
+function borrarSesion() {
+    eliminar('token');
+    eliminar('sesion');
 }
 
 export function AuthProvider({ children }) {
-    const [usuarios, setUsuarios] = useState(() => {
-        const guardados = leer('usuarios', null);
-        if (guardados) {
-            return guardados;
-        }
-        guardar('usuarios', usuariosSemilla);
-        return usuariosSemilla;
-    });
+    const [user, setUser] = useState(() => (leer('token') ? leer('sesion', null) : null));
 
-    const [user, setUser] = useState(() => {
-        const sesion = leer('sesion', null);
-        if (!sesion) {
-            return null;
-        }
-        const completo = usuarios.find((item) => item.id === sesion.id);
-        return sinPassword(completo || sesion);
-    });
+    /** Relee el usuario desde /api/auth/yo (al montar y tras editar el perfil). */
+    const refrescarSesion = () =>
+        api('/api/auth/yo')
+            .then((datos) => {
+                guardar('sesion', datos);
+                setUser(datos);
+            })
+            .catch((error) => {
+                // Sin conexión se conserva la sesión; token vencido o cuenta bloqueada la cierran.
+                if (error.status === 401 || error.status === 403) {
+                    borrarSesion();
+                    setUser(null);
+                }
+            });
 
-    const iniciarSesion = (usuario) => {
-        const sesion = sinPassword(usuario);
-        guardar('sesion', sesion);
-        setUser(sesion);
-    };
+    useEffect(() => {
+        if (leer('token')) {
+            refrescarSesion();
+        } else {
+            eliminar('sesion');
+        }
+    }, []);
 
     /**
-     * Valida credenciales y perfil; inicia sesión si coinciden.
      * @param {{usuario: string, password: string, perfil: string}} credenciales
-     * @returns {{ok: boolean, mensaje: string}}
+     * @returns {Promise<{ok: boolean, mensaje: string, codigo?: string}>}
      */
-    const login = ({ usuario, password, perfil }) => {
-        if (!usuario || !password || !perfil) {
-            return { ok: false, mensaje: 'Completa todos los campos antes de ingresar.' };
+    const login = async (credenciales) => {
+        const r = await resultado(api('/api/auth/login', { method: 'POST', body: credenciales }));
+        if (!r.ok) {
+            return r;
         }
-
-        const normalizado = usuario.trim().toLowerCase();
-        const encontrado = usuarios.find((item) => {
-            return (
-                normalizado === item.usuario.toLowerCase() ||
-                normalizado === item.email.toLowerCase()
-            );
-        });
-
-        if (!encontrado) {
-            return {
-                ok: false,
-                mensaje: 'Usuario no registrado. Prueba con admin, cliente, ejecutivo o propietario.'
-            };
-        }
-
-        if (password.trim() !== encontrado.password) {
-            return { ok: false, mensaje: 'La contraseña ingresada es incorrecta.' };
-        }
-
-        if (perfil !== encontrado.rol) {
-            return {
-                ok: false,
-                mensaje: 'El perfil seleccionado no coincide con el usuario ingresado.'
-            };
-        }
-
-        iniciarSesion(encontrado);
-        return { ok: true, mensaje: `Bienvenido ${encontrado.usuario}. Redirigiendo al panel...` };
+        const { token, user: usuario } = r.datos;
+        guardar('token', token);
+        guardar('sesion', usuario);
+        setUser(usuario);
+        const siguiente =
+            usuario.estado === 'Activo' ? 'Redirigiendo al panel...' : 'Tu cuenta aún está en verificación.';
+        return { ok: true, mensaje: `Bienvenido ${usuario.usuario}. ${siguiente}` };
     };
 
     /**
-     * Crea una cuenta, la guarda e inicia sesión automáticamente.
-     * @param {{nombre: string, usuario: string, email: string, password: string, telefono?: string, rol?: string}} datos
-     * @returns {{ok: boolean, mensaje: string}}
+     * Crea la cuenta en estado Pendiente; no inicia sesión (falta activar el correo).
+     * @param {{nombre: string, usuario: string, email: string, rut: string, password: string, telefono?: string, rol?: string}} datos
      */
-    const registrar = ({ nombre, usuario, email, password, telefono, rol }) => {
-        if (!nombre || !usuario || !email || !password) {
-            return { ok: false, mensaje: 'Completa todos los campos obligatorios.' };
-        }
+    const registrar = ({ nombre, usuario, email, rut, password, telefono, rol }) =>
+        resultado(
+            api('/api/auth/registro', {
+                method: 'POST',
+                body: { nombre, usuario, email, rut, password, telefono, rol }
+            })
+        );
 
-        if (password.length < 6) {
-            return { ok: false, mensaje: 'La contraseña debe tener al menos 6 caracteres.' };
-        }
+    /** @param {string} token - Token del enlace de activación. */
+    const verificarCorreo = (token) =>
+        resultado(api('/api/auth/verificar', { method: 'POST', body: { token } }));
 
-        const usuarioNormalizado = usuario.trim().toLowerCase();
-        const emailNormalizado = email.trim().toLowerCase();
-
-        const existe = usuarios.some((item) => {
-            return (
-                item.usuario.toLowerCase() === usuarioNormalizado ||
-                item.email.toLowerCase() === emailNormalizado
-            );
-        });
-
-        if (existe) {
-            return { ok: false, mensaje: 'Ese usuario o correo ya está registrado.' };
-        }
-
-        const nuevo = {
-            id: usuarios.reduce((max, item) => Math.max(max, item.id), 0) + 1,
-            usuario: usuario.trim(),
-            nombre: nombre.trim(),
-            email: emailNormalizado,
-            password,
-            telefono: telefono?.trim() || '',
-            rol: rol || 'cliente'
-        };
-
-        const lista = [...usuarios, nuevo];
-        setUsuarios(lista);
-        guardar('usuarios', lista);
-        iniciarSesion(nuevo);
-
-        return { ok: true, mensaje: `Cuenta creada. Bienvenido ${nuevo.usuario}.` };
-    };
+    /** @param {string} usuario - Usuario o correo de la cuenta pendiente. */
+    const reenviarActivacion = (usuario) =>
+        resultado(api('/api/auth/reenviar-verificacion', { method: 'POST', body: { usuario } }));
 
     const logout = () => {
-        eliminar('sesion');
+        borrarSesion();
         setUser(null);
     };
 
     return (
-        <AuthContext.Provider value={{ user, usuarios, login, registrar, logout }}>
+        <AuthContext.Provider
+            value={{ user, login, registrar, verificarCorreo, reenviarActivacion, refrescarSesion, logout }}
+        >
             {children}
         </AuthContext.Provider>
     );

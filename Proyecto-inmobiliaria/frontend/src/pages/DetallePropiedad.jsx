@@ -1,12 +1,20 @@
-import { useRef, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import Badge from '../components/Badge';
 import Mensaje from '../components/Mensaje';
 import { useAuth } from '../context/AuthContext';
 import { usePropiedades } from '../context/PropiedadesContext';
-import { usePropietarios } from '../context/PropietariosContext';
 import { useVisitas } from '../context/VisitasContext';
-import { ROLES_GESTION } from '../data/roles';
+import { CONFIRMAR_TRANSICION, IMAGEN_DEFECTO, etiquetaTransicion } from '../data/propiedades';
+
+/** Texto de los efectos que devuelve POST /api/propiedades/:id/estado. */
+function describirResumen(resumen = {}) {
+    const partes = [];
+    if (resumen.visitasCanceladas) partes.push(`${resumen.visitasCanceladas} visita(s) cancelada(s)`);
+    if (resumen.arriendosCancelados) partes.push(`${resumen.arriendosCancelados} solicitud(es) cancelada(s)`);
+    if (resumen.arriendosFinalizados) partes.push(`${resumen.arriendosFinalizados} contrato(s) finalizado(s)`);
+    return partes.length ? ` ${partes.join('; ')}.` : '';
+}
 
 const solicitudInicial = {
     nombre: '',
@@ -20,18 +28,19 @@ const solicitudInicial = {
 export default function DetallePropiedad() {
     const { id } = useParams();
     const navigate = useNavigate();
+    const location = useLocation();
     const { user } = useAuth();
-    const { obtener, eliminar } = usePropiedades();
-    const { propietarios } = usePropietarios();
-    const { crear } = useVisitas();
+    const { obtener, cargando, cambiarEstado, eliminar } = usePropiedades();
+    const { crear, horarios } = useVisitas();
     const formRef = useRef(null);
 
     const propiedad = obtener(id);
-    const dueno = propiedad
-        ? propietarios.find((item) => item.id === propiedad.propietarioId)
-        : null;
-    const puedeGestionar = user && ROLES_GESTION.includes(user.rol);
-    const hoy = new Date().toISOString().split('T')[0];
+    // Solo una propiedad Publicada recibe visitas y solicitudes (D9, RN-02, RN-06).
+    const publicada = propiedad?.estado === 'Publicada';
+    // RN-01 y plazos: rango de fechas y bloques libres del día, desde la API.
+    const [agenda, setAgenda] = useState({ desde: '', hasta: '', bloques: [], cargando: false });
+    // Aviso que deja PropiedadEditar al volver (p. ej. "vuelve a revisión").
+    const [aviso, setAviso] = useState(() => location.state?.aviso || { texto: '', tipo: 'success' });
 
     const [solicitud, setSolicitud] = useState(() => ({
         ...solicitudInicial,
@@ -42,22 +51,58 @@ export default function DetallePropiedad() {
     const [mensaje, setMensaje] = useState({ texto: '', tipo: 'success' });
     const [erroresCampo, setErroresCampo] = useState({});
 
+    useEffect(() => {
+        if (!publicada) return;
+        horarios(id).then((r) => r.ok && setAgenda((prev) => ({ ...prev, desde: r.datos.desde, hasta: r.datos.hasta })));
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- solo al cambiar de propiedad o de estado
+    }, [id, publicada]);
+
+    /** Al elegir fecha, pide los bloques libres de ese día. */
+    const cargarBloques = async (fecha) => {
+        setAgenda((prev) => ({ ...prev, bloques: [], cargando: Boolean(fecha) }));
+        if (!fecha) return;
+        const r = await horarios(id, fecha);
+        setAgenda((prev) => ({ ...prev, bloques: r.ok ? r.datos.bloques : [], cargando: false }));
+    };
+
     if (!propiedad) {
         return (
             <main className="seccion detalle-main">
-                <p className="mensaje error visible" role="alert">
-                    No se encontró la propiedad solicitada.
-                </p>
+                {cargando ? (
+                    <p role="status">Cargando propiedad...</p>
+                ) : (
+                    <p className="mensaje error visible" role="alert">
+                        No se encontró la propiedad solicitada.
+                    </p>
+                )}
             </main>
         );
     }
 
-    const puedeArrendar =
-        propiedad.estado === 'Disponible' || propiedad.estado === 'Publicada';
+    // §8: el propietario no agenda; el cliente agenda con los datos de su cuenta.
+    const puedeAgendar = publicada && user?.rol !== 'propietario';
+    const esCliente = user?.rol === 'cliente';
+    const puedeArrendar = publicada && (!user || user.rol === 'cliente');
+
+    /** Lleva la propiedad a `destino`, confirmando si tiene efectos (§7). */
+    const aplicarTransicion = async (destino) => {
+        const advertencia =
+            CONFIRMAR_TRANSICION[destino] || CONFIRMAR_TRANSICION[`${propiedad.estado}→${destino}`];
+        const accion = etiquetaTransicion(propiedad.estado, destino);
+        if (advertencia && !window.confirm(`¿${accion}? ${advertencia}`)) return;
+
+        const r = await cambiarEstado(propiedad.id, destino);
+        setAviso(
+            r.ok
+                ? { texto: `Propiedad ahora ${destino}.${describirResumen(r.datos.resumen)}`, tipo: 'success' }
+                : { texto: r.mensaje, tipo: 'error' }
+        );
+    };
 
     const handleChange = (event) => {
         const { name, value } = event.target;
-        setSolicitud((prev) => ({ ...prev, [name]: value }));
+        setSolicitud((prev) => ({ ...prev, [name]: value, ...(name === 'fecha' && { hora: '' }) }));
+        if (name === 'fecha') cargarBloques(value);
         setErroresCampo((prev) => {
             if (!prev[name]) return prev;
             const siguiente = { ...prev };
@@ -75,7 +120,7 @@ export default function DetallePropiedad() {
         }
     };
 
-    const solicitarVisita = (event) => {
+    const solicitarVisita = async (event) => {
         event.preventDefault();
 
         const errores = {};
@@ -95,9 +140,8 @@ export default function DetallePropiedad() {
         }
 
         setErroresCampo({});
-        const resultado = crear({
+        const resultado = await crear({
             propiedadId: propiedad.id,
-            propiedadTitulo: propiedad.titulo,
             nombre: solicitud.nombre.trim(),
             email: solicitud.email.trim(),
             telefono: solicitud.telefono.trim(),
@@ -111,18 +155,17 @@ export default function DetallePropiedad() {
             return;
         }
 
-        setMensaje({
-            texto: 'Solicitud de visita registrada. Te contactaremos para confirmar.',
-            tipo: 'success'
-        });
+        setMensaje({ texto: resultado.mensaje, tipo: 'success' });
         setSolicitud((prev) => ({ ...prev, fecha: '', hora: '', comentarios: '' }));
+        setAgenda((prev) => ({ ...prev, bloques: [] }));
     };
 
-    const handleEliminar = () => {
-        if (window.confirm(`¿Eliminar la propiedad "${propiedad.titulo}"?`)) {
-            eliminar(propiedad.id);
-            navigate('/propiedades');
-        }
+    /** Borrado físico: solo admin y solo sin historial (el backend lo valida). */
+    const handleEliminar = async () => {
+        if (!window.confirm(`¿Eliminar definitivamente "${propiedad.titulo}"? No se puede deshacer.`)) return;
+        const r = await eliminar(propiedad.id);
+        if (r.ok) navigate('/propiedades');
+        else setAviso({ texto: r.mensaje, tipo: 'error' });
     };
 
     const totalAPagar = propiedad.precioMensual + (propiedad.gastosComunes || 0);
@@ -132,7 +175,7 @@ export default function DetallePropiedad() {
             <section className="detalle-card">
                 <article className="detalle-contenedor">
                     <div className="detalle-imagen">
-                        <img src={propiedad.imagen} alt={propiedad.titulo} />
+                        <img src={propiedad.imagen || IMAGEN_DEFECTO} alt={propiedad.titulo} />
                     </div>
                     <div className="detalle-info">
                         <span className="tipo-propiedad">{propiedad.tipo}</span>
@@ -148,10 +191,13 @@ export default function DetallePropiedad() {
                             <li>
                                 <span aria-hidden="true">📍</span> Comuna: {propiedad.comuna}
                             </li>
-                            <li>
-                                <span aria-hidden="true">🏠</span> Dirección:{' '}
-                                {propiedad.direccion || 'Sin dirección registrada'}
-                            </li>
+                            {/* La API solo envía la dirección a internos y al dueño (D5). */}
+                            {'direccion' in propiedad && (
+                                <li>
+                                    <span aria-hidden="true">🏠</span> Dirección:{' '}
+                                    {propiedad.direccion || 'Sin dirección registrada'}
+                                </li>
+                            )}
                             <li>
                                 <span aria-hidden="true">🛏️</span> Dormitorios:{' '}
                                 {propiedad.dormitorios}
@@ -175,9 +221,14 @@ export default function DetallePropiedad() {
                                 <span aria-hidden="true">💰</span> Total mensual estimado:${' '}
                                 {totalAPagar.toLocaleString('es-CL')}
                             </li>
-                            {dueno && (
+                            <li>
+                                <span aria-hidden="true">🤝</span> Ejecutivo a cargo:{' '}
+                                {propiedad.ejecutivoNombre || 'Gestión Urbana'}
+                            </li>
+                            {propiedad.propietarioNombre && (
                                 <li>
-                                    <span aria-hidden="true">👤</span> Propietario: {dueno.nombre}
+                                    <span aria-hidden="true">👤</span> Propietario:{' '}
+                                    {propiedad.propietarioNombre}
                                 </li>
                             )}
                         </ul>
@@ -197,24 +248,36 @@ export default function DetallePropiedad() {
                             <Link to="/propiedades" className="boton boton-ver">
                                 Volver al catálogo
                             </Link>
-                            {puedeGestionar && (
-                                <>
-                                    <Link
-                                        to={`/propiedades/${propiedad.id}/editar`}
-                                        className="boton boton-ver"
-                                    >
-                                        Editar
-                                    </Link>
-                                    <button
-                                        type="button"
-                                        className="boton boton-ver boton-peligro"
-                                        onClick={handleEliminar}
-                                    >
-                                        Eliminar
-                                    </button>
-                                </>
+                            {propiedad.puedeEditar && (
+                                <Link
+                                    to={`/propiedades/${propiedad.id}/editar`}
+                                    className="boton boton-ver"
+                                >
+                                    Editar
+                                </Link>
+                            )}
+                            {(propiedad.transiciones || []).map((destino) => (
+                                <button
+                                    key={destino}
+                                    type="button"
+                                    className={`boton boton-ver${destino === 'Inactiva' ? ' boton-peligro' : ''}`}
+                                    onClick={() => aplicarTransicion(destino)}
+                                >
+                                    {etiquetaTransicion(propiedad.estado, destino)}
+                                </button>
+                            ))}
+                            {user?.rol === 'admin' && (
+                                <button
+                                    type="button"
+                                    className="boton boton-ver boton-peligro"
+                                    onClick={handleEliminar}
+                                >
+                                    Eliminar definitivamente
+                                </button>
                             )}
                         </div>
+
+                        <Mensaje texto={aviso.texto} tipo={aviso.tipo} />
 
                         {puedeArrendar && (
                             <div className="acciones-detalle">
@@ -227,10 +290,16 @@ export default function DetallePropiedad() {
                 </article>
             </section>
 
+            {!publicada ? (
+                <p className="mensaje sin-resultados visible" role="status">
+                    Esta propiedad está {propiedad.estado}: no recibe visitas ni solicitudes por ahora.
+                </p>
+            ) : !puedeAgendar ? null : (
             <section className="tarjeta-form seccion-visita">
                 <h2>Solicitar visita</h2>
                 <p className="subtitulo-login">
-                    Elige la fecha y hora que prefieras y coordinamos el recorrido.
+                    Visitas de 30 minutos, de lunes a viernes (excepto feriados) entre 09:00 y 18:00. El
+                    ejecutivo confirma la visita y te envía la dirección exacta por correo.
                 </p>
 
                 <form
@@ -248,6 +317,7 @@ export default function DetallePropiedad() {
                             name="nombre"
                             value={solicitud.nombre}
                             onChange={handleChange}
+                            readOnly={esCliente}
                             required
                             autoComplete="name"
                             aria-invalid={erroresCampo.nombre ? 'true' : undefined}
@@ -270,6 +340,7 @@ export default function DetallePropiedad() {
                             name="email"
                             value={solicitud.email}
                             onChange={handleChange}
+                            readOnly={esCliente}
                             required
                             autoComplete="email"
                             aria-invalid={erroresCampo.email ? 'true' : undefined}
@@ -303,7 +374,8 @@ export default function DetallePropiedad() {
                             type="date"
                             id="fecha-visita"
                             name="fecha"
-                            min={hoy}
+                            min={agenda.desde}
+                            max={agenda.hasta}
                             value={solicitud.fecha}
                             onChange={handleChange}
                             required
@@ -319,20 +391,35 @@ export default function DetallePropiedad() {
 
                     <div className="campo">
                         <label htmlFor="hora-visita">Hora</label>
-                        <input
-                            type="time"
+                        <select
                             id="hora-visita"
                             name="hora"
                             value={solicitud.hora}
                             onChange={handleChange}
                             required
+                            disabled={!agenda.bloques.length}
                             aria-invalid={erroresCampo.hora ? 'true' : undefined}
-                            aria-describedby={erroresCampo.hora ? 'hora-visita-error' : undefined}
-                        />
-                        {erroresCampo.hora && (
+                            aria-describedby={erroresCampo.hora ? 'hora-visita-error' : 'hora-visita-ayuda'}
+                        >
+                            <option value="">
+                                {agenda.cargando ? 'Buscando horarios...' : 'Elige un horario'}
+                            </option>
+                            {agenda.bloques.map((hora) => (
+                                <option key={hora} value={hora}>{hora}</option>
+                            ))}
+                        </select>
+                        {erroresCampo.hora ? (
                             <span id="hora-visita-error" className="error-campo">
                                 {erroresCampo.hora}
                             </span>
+                        ) : (
+                            <small id="hora-visita-ayuda" aria-live="polite">
+                                {!solicitud.fecha
+                                    ? 'Primero elige una fecha.'
+                                    : !agenda.cargando && !agenda.bloques.length
+                                        ? 'No hay horarios libres ese día (fin de semana, feriado o agenda completa).'
+                                        : ''}
+                            </small>
                         )}
                     </div>
 
@@ -359,6 +446,7 @@ export default function DetallePropiedad() {
                     </div>
                 </form>
             </section>
+            )}
         </main>
     );
 }
