@@ -12,7 +12,7 @@ const COMPROMETIDAS = ['Reservada', 'Arrendada'];
 /**
  * §5.1: estado actual → { destino: quién }. 'cartera' = ejecutivo responsable
  * o admin; 'gestion' = además el propietario dueño. A Reservada solo se llega
- * con la segunda aprobación del arriendo (routes/arriendos.js, RN-09).
+ * con la segunda aprobación del arriendo (controllers/arriendosController.js, RN-09).
  */
 const TRANSICIONES = {
     Disponible: { Publicada: 'cartera', 'En mantención': 'gestion', Inactiva: 'gestion' },
