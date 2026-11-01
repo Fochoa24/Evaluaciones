@@ -82,6 +82,6 @@ con el código HTTP correspondiente.
 ## Pruebas
 
 ```bash
-cd backend && npm test
+cd backend && npm test && npm run lint
 cd frontend && npm run lint
 ```
