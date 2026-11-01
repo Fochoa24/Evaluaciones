@@ -12,7 +12,7 @@ const ETIQUETAS_ROL = {
     propietario: 'Propietario',
     cliente: 'Cliente'
 };
-/** Igual que backend/routes/usuarios.js: el ejecutivo administra propietarios y clientes. */
+/** Igual que backend/controllers/usuariosController.js: el ejecutivo administra propietarios y clientes. */
 const ROLES_POR_ACTOR = {
     admin: ['propietario', 'cliente', 'ejecutivo', 'admin'],
     ejecutivo: ['propietario', 'cliente']

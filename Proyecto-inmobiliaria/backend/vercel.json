@@ -1,0 +1,10 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "express",
+  "crons": [
+    {
+      "path": "/api/tareas",
+      "schedule": "0 12 * * *"
+    }
+  ]
+}
