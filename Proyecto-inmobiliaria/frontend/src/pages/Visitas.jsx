@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import AvisoFicticio from '../components/AvisoFicticio';
+import { useAuth } from '../context/AuthContext';
 import { useVisitas } from '../context/VisitasContext';
-import { ESTADOS_VISITA, RESULTADOS_VISITA } from '../data/flujo';
+import { ESTADOS_VISITA, HORAS_VISITA, RESULTADOS_VISITA } from '../data/flujo';
+import { ROLES_INTERNOS } from '../data/roles';
 
 const CLASES_BADGE = {
     Pendiente: 'reservada',
@@ -12,183 +13,125 @@ const CLASES_BADGE = {
     Realizada: 'disponible'
 };
 
+/** Texto del botón para cada destino que entrega la API en `transiciones`. */
+const ETIQUETAS = { Confirmada: 'Confirmar', Rechazada: 'Rechazar', Cancelada: 'Cancelar', Realizada: 'Realizada' };
+
+/**
+ * Visitas según el rol (§8): el ejecutivo ve su cartera y el admin todas;
+ * el cliente, las suyas; el propietario, las de sus propiedades sin datos
+ * de contacto. Los botones salen de `transiciones` y `puedeReprogramar`.
+ */
 export default function Visitas() {
-    const { visitas, actualizar, actualizarEstado, eliminar, hayConflicto } = useVisitas();
+    const { user } = useAuth();
+    const { visitas, cargando, error, reprogramar, cambiarEstado, eliminar } = useVisitas();
     const [filtroEstado, setFiltroEstado] = useState('');
-    const [editandoId, setEditandoId] = useState(null);
-    const [formEdicion, setFormEdicion] = useState({ fecha: '', hora: '', resultado: '' });
+    // { id, modo: 'reprogramar' | 'realizar', fecha, hora, resultado }
+    const [edicion, setEdicion] = useState(null);
     const [mensaje, setMensaje] = useState({ texto: '', tipo: 'success' });
 
-    const visitasFiltradas = filtroEstado
-        ? visitas.filter((item) => item.estado === filtroEstado)
-        : visitas;
+    const interno = ROLES_INTERNOS.includes(user.rol);
+    const esCliente = user.rol === 'cliente';
+    const visitasFiltradas = filtroEstado ? visitas.filter((item) => item.estado === filtroEstado) : visitas;
 
-    const abrirEdicion = (visita) => {
-        setEditandoId(visita.id);
-        setFormEdicion({
-            fecha: visita.fecha,
-            hora: visita.hora,
-            resultado: visita.resultado || ''
-        });
+    const informar = (r, exito) =>
+        setMensaje(r.ok ? { texto: exito, tipo: 'success' } : { texto: r.mensaje, tipo: 'error' });
+
+    const abrir = (visita, modo) => {
+        setEdicion({ id: visita.id, modo, fecha: visita.fecha, hora: visita.hora, resultado: '' });
         setMensaje({ texto: '', tipo: 'success' });
     };
+    const cambiarCampo = (campo) => (event) => setEdicion((prev) => ({ ...prev, [campo]: event.target.value }));
 
-    const cancelarEdicion = () => {
-        setEditandoId(null);
-        setMensaje({ texto: '', tipo: 'success' });
+    const aplicar = async (visita, destino) => {
+        if (destino === 'Realizada') return abrir(visita, 'realizar');
+        if (destino === 'Cancelada' && !window.confirm(`¿Cancelar la visita del ${visita.fecha} a las ${visita.hora}?`)) return;
+        const r = await cambiarEstado(visita.id, destino);
+        informar(r, `Visita ${destino.toLowerCase()}.`);
     };
 
-    const guardarEdicion = (visita) => {
-        const conflicto = hayConflicto({
-            fecha: formEdicion.fecha,
-            hora: formEdicion.hora,
-            excluirId: visita.id
-        });
-
-        if (conflicto) {
-            setMensaje({
-                texto: `Horario en conflicto: ya hay una visita activa el ${formEdicion.fecha} a las ${formEdicion.hora}.`,
-                tipo: 'error'
-            });
-            return;
-        }
-
-        actualizar(visita.id, {
-            fecha: formEdicion.fecha,
-            hora: formEdicion.hora,
-            resultado: formEdicion.resultado
-        });
-
-        setEditandoId(null);
-        setMensaje({ texto: 'Visita actualizada correctamente.', tipo: 'success' });
+    const guardarEdicion = async () => {
+        const r = edicion.modo === 'reprogramar'
+            ? await reprogramar(edicion.id, { fecha: edicion.fecha, hora: edicion.hora })
+            : await cambiarEstado(edicion.id, 'Realizada', edicion.resultado);
+        informar(r, edicion.modo === 'reprogramar' ? 'Visita reprogramada.' : 'Visita cerrada como realizada.');
+        if (r.ok) setEdicion(null);
     };
 
-    const confirmar = (visita) => {
-        actualizarEstado(visita.id, 'Confirmada');
-        setMensaje({ texto: `Visita de ${visita.nombre} confirmada.`, tipo: 'success' });
+    const eliminarVisita = async (visita) => {
+        if (!window.confirm(`¿Eliminar definitivamente la visita de ${visita.nombre}?`)) return;
+        informar(await eliminar(visita.id), 'Visita eliminada.');
     };
 
-    const rechazar = (visita) => {
-        actualizarEstado(visita.id, 'Rechazada');
-        setMensaje({ texto: `Visita de ${visita.nombre} rechazada.`, tipo: 'success' });
-    };
-
-    const cancelar = (visita) => {
-        actualizarEstado(visita.id, 'Cancelada');
-        setMensaje({ texto: `Visita de ${visita.nombre} cancelada.`, tipo: 'success' });
-    };
-
-    const marcarRealizada = (visita) => {
-        const resultado = visita.resultado || 'Interesado en arrendar';
-        actualizarEstado(visita.id, 'Realizada', { resultado });
-        setMensaje({ texto: `Visita de ${visita.nombre} cerrada como realizada.`, tipo: 'success' });
-    };
-
-    const eliminarVisita = (visita) => {
-        if (window.confirm(`¿Eliminar la solicitud de visita de ${visita.nombre}?`)) {
-            eliminar(visita.id);
-            setMensaje({ texto: 'Solicitud eliminada.', tipo: 'success' });
-        }
-    };
-
-    const accionesPorEstado = (visita) => {
-        const acciones = [];
-
-        if (['Pendiente', 'Confirmada'].includes(visita.estado)) {
-            acciones.push(
-                <button
-                    key="confirmar"
-                    type="button"
-                    className="boton boton-mini"
-                    onClick={() => confirmar(visita)}
-                    aria-label={`Confirmar visita de ${visita.nombre}`}
-                    disabled={visita.estado === 'Confirmada'}
-                >
-                    Confirmar
-                </button>,
-                <button
-                    key="rechazar"
-                    type="button"
-                    className="boton boton-mini boton-secundario"
-                    onClick={() => rechazar(visita)}
-                    aria-label={`Rechazar visita de ${visita.nombre}`}
-                >
-                    Rechazar
-                </button>,
-                <button
-                    key="cancelar"
-                    type="button"
-                    className="boton boton-mini boton-secundario"
-                    onClick={() => cancelar(visita)}
-                    aria-label={`Cancelar visita de ${visita.nombre}`}
-                >
-                    Cancelar
-                </button>,
-                <button
-                    key="realizada"
-                    type="button"
-                    className="boton boton-mini"
-                    onClick={() => marcarRealizada(visita)}
-                    aria-label={`Marcar visita de ${visita.nombre} como realizada`}
-                >
-                    Realizada
+    const formularioEdicion = (visita) => (
+        <div className="edicion-visita">
+            {edicion.modo === 'reprogramar' ? (
+                <>
+                    <label className="visually-hidden" htmlFor={`fecha-${visita.id}`}>Nueva fecha</label>
+                    <input type="date" id={`fecha-${visita.id}`} value={edicion.fecha} onChange={cambiarCampo('fecha')} />
+                    <label className="visually-hidden" htmlFor={`hora-${visita.id}`}>Nueva hora</label>
+                    <select id={`hora-${visita.id}`} value={edicion.hora} onChange={cambiarCampo('hora')}>
+                        {HORAS_VISITA.map((hora) => (
+                            <option key={hora} value={hora}>{hora}</option>
+                        ))}
+                    </select>
+                </>
+            ) : (
+                <>
+                    <label className="visually-hidden" htmlFor={`resultado-${visita.id}`}>Resultado</label>
+                    <select id={`resultado-${visita.id}`} value={edicion.resultado} onChange={cambiarCampo('resultado')}>
+                        {RESULTADOS_VISITA.map((resultado) => (
+                            <option key={resultado} value={resultado}>{resultado || 'Elige el resultado'}</option>
+                        ))}
+                    </select>
+                </>
+            )}
+            <div className="acciones-tabla">
+                <button type="button" className="boton boton-mini" onClick={guardarEdicion}>Guardar</button>
+                <button type="button" className="boton boton-mini boton-secundario" onClick={() => setEdicion(null)}>
+                    Volver
                 </button>
-            );
-        }
+            </div>
+        </div>
+    );
 
-        if (visita.estado === 'Realizada') {
-            acciones.push(
+    const acciones = (visita) => (
+        <div className="acciones-tabla">
+            {visita.transiciones.map((destino) => (
                 <button
-                    key="resultado"
+                    key={destino}
                     type="button"
-                    className="boton boton-mini"
-                    onClick={() => abrirEdicion(visita)}
-                    aria-label={`Registrar resultado de visita de ${visita.nombre}`}
+                    className={`boton boton-mini${['Rechazada', 'Cancelada'].includes(destino) ? ' boton-secundario' : ''}`}
+                    onClick={() => aplicar(visita, destino)}
+                    aria-label={`${ETIQUETAS[destino]} visita del ${visita.fecha} a las ${visita.hora}`}
                 >
-                    Resultado
+                    {ETIQUETAS[destino]}
                 </button>
-            );
-        }
-
-        if (['Pendiente', 'Confirmada'].includes(visita.estado)) {
-            acciones.push(
-                <button
-                    key="editar"
-                    type="button"
-                    className="boton boton-mini boton-secundario"
-                    onClick={() => abrirEdicion(visita)}
-                    aria-label={`Reprogramar visita de ${visita.nombre}`}
-                >
+            ))}
+            {visita.puedeReprogramar && (
+                <button type="button" className="boton boton-mini boton-secundario" onClick={() => abrir(visita, 'reprogramar')}>
                     Reprogramar
                 </button>
-            );
-        }
-
-        acciones.push(
-            <button
-                key="eliminar"
-                type="button"
-                className="boton boton-mini boton-peligro"
-                onClick={() => eliminarVisita(visita)}
-                aria-label={`Eliminar visita de ${visita.nombre}`}
-            >
-                Eliminar
-            </button>
-        );
-
-        return acciones;
-    };
+            )}
+            {user.rol === 'admin' && (
+                <button type="button" className="boton boton-mini boton-peligro" onClick={() => eliminarVisita(visita)}>
+                    Eliminar
+                </button>
+            )}
+        </div>
+    );
 
     return (
         <main className="seccion dashboard-main">
             <section className="dashboard-header">
-                <p className="etiqueta">SOLICITUDES DE VISITA</p>
-                <h1>Gestión de visitas y agenda</h1>
+                <p className="etiqueta">{esCliente ? 'MIS VISITAS' : 'SOLICITUDES DE VISITA'}</p>
+                <h1>{esCliente ? 'Mis visitas agendadas' : 'Gestión de visitas y agenda'}</h1>
                 <p className="subtitulo-login">
-                    Confirma, rechaza, reprograma o cierra visitas. El sistema evita superposiciones
-                    de horario en la agenda.
+                    {interno
+                        ? 'Confirma, rechaza, reprograma o cierra las visitas de tu cartera. El sistema evita choques de horario y respeta el tiempo de traslado.'
+                        : esCliente
+                            ? 'Cuando el ejecutivo confirme una visita, verás la dirección exacta en el detalle de la propiedad y te llegará por correo.'
+                            : 'Visitas agendadas a tus propiedades. Los datos de contacto los gestiona tu ejecutivo.'}
                 </p>
-                <AvisoFicticio texto="Las citas agendadas que ves son de demostración y no corresponden a visitas reales de la inmobiliaria." />
             </section>
 
             {mensaje.texto && (
@@ -211,9 +154,7 @@ export default function Visitas() {
                         >
                             <option value="">Todos</option>
                             {ESTADOS_VISITA.map((estado) => (
-                                <option key={estado} value={estado}>
-                                    {estado}
-                                </option>
+                                <option key={estado} value={estado}>{estado}</option>
                             ))}
                         </select>
                     </div>
@@ -221,137 +162,64 @@ export default function Visitas() {
             </section>
 
             <section className="table-panel">
-                <h2>Listado de solicitudes</h2>
-                {visitasFiltradas.length ? (
+                <h2>Listado de visitas</h2>
+                {cargando && !visitas.length ? (
+                    <p role="status">Cargando visitas...</p>
+                ) : error ? (
+                    <p className="mensaje error visible" role="alert">{error}</p>
+                ) : visitasFiltradas.length ? (
                     <div className="tabla-wrap">
-                        <table aria-label="Solicitudes de visita coordinadas">
+                        <table aria-label="Visitas agendadas">
                             <thead>
                                 <tr>
                                     <th scope="col">Propiedad</th>
-                                    <th scope="col">Interesado</th>
-                                    <th scope="col">Contacto</th>
+                                    {interno && <th scope="col">Interesado</th>}
+                                    {interno && <th scope="col">Contacto</th>}
                                     <th scope="col">Fecha y hora</th>
+                                    <th scope="col">Ejecutivo</th>
                                     <th scope="col">Estado</th>
                                     <th scope="col">Resultado</th>
-                                    <th scope="col">Acciones</th>
+                                    {user.rol !== 'propietario' && <th scope="col">Acciones</th>}
                                 </tr>
                             </thead>
                             <tbody>
                                 {visitasFiltradas.map((visita) => (
                                     <tr key={visita.id}>
                                         <th scope="row">
-                                            <Link
-                                                to={`/propiedades/${visita.propiedadId}`}
-                                                className="link-detalle"
-                                            >
+                                            <Link to={`/propiedades/${visita.propiedadId}`} className="link-detalle">
                                                 {visita.propiedadTitulo}
                                             </Link>
                                         </th>
+                                        {interno && (
+                                            <td>
+                                                {visita.nombre}
+                                                {visita.comentarios && <div className="subtexto-tabla">{visita.comentarios}</div>}
+                                            </td>
+                                        )}
+                                        {interno && (
+                                            <td>
+                                                {visita.email}
+                                                <div className="subtexto-tabla">{visita.telefono}</div>
+                                            </td>
+                                        )}
                                         <td>
-                                            {visita.nombre}
-                                            {visita.comentarios ? (
-                                                <div className="subtexto-tabla">{visita.comentarios}</div>
-                                            ) : null}
+                                            {visita.fecha} {visita.hora}
                                         </td>
+                                        <td>{visita.ejecutivoNombre}</td>
                                         <td>
-                                            {visita.email}
-                                            <div className="subtexto-tabla">{visita.telefono}</div>
-                                        </td>
-                                        <td>
-                                            {editandoId === visita.id ? (
-                                                <div className="edicion-visita">
-                                                    <label className="visually-hidden" htmlFor={`fecha-${visita.id}`}>
-                                                        Nueva fecha
-                                                    </label>
-                                                    <input
-                                                        type="date"
-                                                        id={`fecha-${visita.id}`}
-                                                        value={formEdicion.fecha}
-                                                        onChange={(event) =>
-                                                            setFormEdicion((prev) => ({
-                                                                ...prev,
-                                                                fecha: event.target.value
-                                                            }))
-                                                        }
-                                                    />
-                                                    <label className="visually-hidden" htmlFor={`hora-${visita.id}`}>
-                                                        Nueva hora
-                                                    </label>
-                                                    <input
-                                                        type="time"
-                                                        id={`hora-${visita.id}`}
-                                                        value={formEdicion.hora}
-                                                        onChange={(event) =>
-                                                            setFormEdicion((prev) => ({
-                                                                ...prev,
-                                                                hora: event.target.value
-                                                            }))
-                                                        }
-                                                    />
-                                                    <label
-                                                        className="visually-hidden"
-                                                        htmlFor={`resultado-${visita.id}`}
-                                                    >
-                                                        Resultado
-                                                    </label>
-                                                    <select
-                                                        id={`resultado-${visita.id}`}
-                                                        value={formEdicion.resultado}
-                                                        onChange={(event) =>
-                                                            setFormEdicion((prev) => ({
-                                                                ...prev,
-                                                                resultado: event.target.value
-                                                            }))
-                                                        }
-                                                    >
-                                                        {RESULTADOS_VISITA.map((resultado) => (
-                                                            <option key={resultado} value={resultado}>
-                                                                {resultado || 'Sin resultado'}
-                                                            </option>
-                                                        ))}
-                                                    </select>
-                                                    <div className="acciones-tabla">
-                                                        <button
-                                                            type="button"
-                                                            className="boton boton-mini"
-                                                            onClick={() => guardarEdicion(visita)}
-                                                        >
-                                                            Guardar
-                                                        </button>
-                                                        <button
-                                                            type="button"
-                                                            className="boton boton-mini boton-secundario"
-                                                            onClick={cancelarEdicion}
-                                                        >
-                                                            Cancelar
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            ) : (
-                                                <>
-                                                    {visita.fecha} {visita.hora}
-                                                </>
-                                            )}
-                                        </td>
-                                        <td>
-                                            <span
-                                                className={`badge ${CLASES_BADGE[visita.estado] || 'disponible'}`}
-                                            >
+                                            <span className={`badge ${CLASES_BADGE[visita.estado] || 'disponible'}`}>
                                                 {visita.estado}
                                             </span>
-                                        </td>
-                                        <td>
-                                            {visita.resultado || (
-                                                <span className="subtexto-tabla">Sin resultado</span>
+                                            {visita.reasignada && (
+                                                <div className="subtexto-tabla">Reasignada: revisar horario</div>
                                             )}
                                         </td>
                                         <td>
-                                            {editandoId === visita.id ? null : (
-                                                <div className="acciones-tabla">
-                                                    {accionesPorEstado(visita)}
-                                                </div>
-                                            )}
+                                            {visita.resultado || <span className="subtexto-tabla">Sin resultado</span>}
                                         </td>
+                                        {user.rol !== 'propietario' && (
+                                            <td>{edicion?.id === visita.id ? formularioEdicion(visita) : acciones(visita)}</td>
+                                        )}
                                     </tr>
                                 ))}
                             </tbody>
@@ -359,8 +227,8 @@ export default function Visitas() {
                     </div>
                 ) : (
                     <p className="mensaje sin-resultados visible" role="status">
-                        No hay solicitudes con este filtro. Puedes pedirlas desde el detalle de cada
-                        propiedad.
+                        No hay visitas con este filtro.
+                        {!interno && ' Puedes agendar una desde el detalle de cada propiedad publicada.'}
                     </p>
                 )}
             </section>

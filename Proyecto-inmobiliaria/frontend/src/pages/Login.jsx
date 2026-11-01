@@ -12,12 +12,15 @@ const credencialesIniciales = {
 export default function Login() {
     const navigate = useNavigate();
     const location = useLocation();
-    const { login } = useAuth();
+    const { login, reenviarActivacion } = useAuth();
     const [credenciales, setCredenciales] = useState(credencialesIniciales);
     const [mensaje, setMensaje] = useState({ texto: '', tipo: 'error' });
     const [erroresCampo, setErroresCampo] = useState({});
+    const [enviando, setEnviando] = useState(false);
+    const [sinActivar, setSinActivar] = useState(false);
     const formRef = useRef(null);
 
+    // Cada rol tiene su panel (el del cliente es "Mi panel").
     const destino = location.state?.from || '/dashboard';
 
     const handleChange = (event) => {
@@ -40,7 +43,7 @@ export default function Login() {
         }
     };
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
 
         const errores = {};
@@ -56,7 +59,10 @@ export default function Login() {
         }
 
         setErroresCampo({});
-        const resultado = login(credenciales);
+        setEnviando(true);
+        const resultado = await login(credenciales);
+        setEnviando(false);
+        setSinActivar(resultado.codigo === 'EMAIL_NO_VERIFICADO');
 
         if (!resultado.ok) {
             setMensaje({ texto: resultado.mensaje, tipo: 'error' });
@@ -68,6 +74,13 @@ export default function Login() {
         setTimeout(() => {
             navigate(destino, { replace: true });
         }, 800);
+    };
+
+    const reenviar = async () => {
+        setEnviando(true);
+        const resultado = await reenviarActivacion(credenciales.usuario);
+        setEnviando(false);
+        setMensaje({ texto: resultado.mensaje, tipo: resultado.ok ? 'success' : 'error' });
     };
 
     return (
@@ -146,11 +159,22 @@ export default function Login() {
                         )}
                     </div>
 
-                    <button type="submit" className="boton boton-login">
-                        Ingresar
+                    <button type="submit" className="boton boton-login" disabled={enviando}>
+                        {enviando ? 'Ingresando...' : 'Ingresar'}
                     </button>
 
                     <Mensaje texto={mensaje.texto} tipo={mensaje.tipo} />
+
+                    {sinActivar && (
+                        <button
+                            type="button"
+                            className="boton boton-ver"
+                            onClick={reenviar}
+                            disabled={enviando}
+                        >
+                            Reenviar enlace de activación
+                        </button>
+                    )}
 
                     <p className="enlace-registro">
                         ¿No tienes cuenta? <Link to="/registro">Regístrate aquí</Link>

@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { IMAGEN_DEFECTO } from '../data/propiedades';
 
 export default function PropiedadCard({ propiedad }) {
     const estadoClase = propiedad.estado === 'Reservada' ? 'reservada' : 'disponible';
@@ -7,7 +8,7 @@ export default function PropiedadCard({ propiedad }) {
     return (
         <article className="tarjeta-propiedad">
             <div className="imagen-contenedor">
-                <img src={propiedad.imagen} alt={propiedad.titulo} />
+                <img src={propiedad.imagen || IMAGEN_DEFECTO} alt={propiedad.titulo} />
                 <span className={`insignia-estado ${estadoClase}`}>{propiedad.estado}</span>
             </div>
             <div className="info-propiedad">

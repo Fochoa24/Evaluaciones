@@ -6,9 +6,19 @@ export default function PropiedadNueva() {
     const navigate = useNavigate();
     const { crear } = usePropiedades();
 
-    const handleSubmit = (valores) => {
-        const nueva = crear(valores);
-        navigate(`/propiedades/${nueva.id}`);
+    const handleSubmit = async (valores) => {
+        const resultado = await crear(valores);
+        if (resultado.ok) {
+            navigate(`/propiedades/${resultado.datos.id}`, {
+                state: {
+                    aviso: {
+                        texto: 'Propiedad creada como Disponible: el ejecutivo responsable la revisará y publicará.',
+                        tipo: 'success'
+                    }
+                }
+            });
+        }
+        return resultado;
     };
 
     return (
@@ -19,7 +29,7 @@ export default function PropiedadNueva() {
             </section>
 
             <section className="tarjeta-form">
-                <PropiedadForm onSubmit={handleSubmit} textoBoton="Publicar propiedad" />
+                <PropiedadForm onSubmit={handleSubmit} textoBoton="Crear propiedad" />
             </section>
         </main>
     );

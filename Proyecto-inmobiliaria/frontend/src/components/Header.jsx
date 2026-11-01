@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { ROLES_ATENCION, ROLES_EVALUAN, ROLES_GESTION } from '../data/roles';
+import { ROLES_GESTION, ROLES_INTERNOS } from '../data/roles';
 
 const ETIQUETAS_ROL = {
     admin: 'Administrador',
@@ -147,33 +147,36 @@ export default function Header() {
                                         </div>
 
                                         <Link to="/dashboard" role="menuitem" onClick={cerrarMenus}>
-                                            <span aria-hidden="true">📊</span> Panel administrativo
+                                            <span aria-hidden="true">📊</span>{' '}
+                                            {ROLES_INTERNOS.includes(user.rol) ? 'Panel administrativo' : 'Mi panel'}
                                         </Link>
                                         {ROLES_GESTION.includes(user.rol) && (
                                             <Link to="/propiedades/nueva" role="menuitem" onClick={cerrarMenus}>
                                                 <span aria-hidden="true">🏠</span> Nueva propiedad
                                             </Link>
                                         )}
-                                        {ROLES_ATENCION.includes(user.rol) && (
-                                            <Link to="/visitas" role="menuitem" onClick={cerrarMenus}>
-                                                <span aria-hidden="true">📅</span> Solicitudes de visita
+                                        <Link to="/visitas" role="menuitem" onClick={cerrarMenus}>
+                                            <span aria-hidden="true">📅</span>{' '}
+                                            {ROLES_INTERNOS.includes(user.rol) ? 'Solicitudes de visita' : 'Mis visitas'}
+                                        </Link>
+                                        <Link to="/arriendos" role="menuitem" onClick={cerrarMenus}>
+                                            <span aria-hidden="true">📝</span>{' '}
+                                            {user.rol === 'cliente' ? 'Mis solicitudes' : 'Solicitudes de arriendo'}
+                                        </Link>
+                                        {ROLES_INTERNOS.includes(user.rol) && (
+                                            <Link to="/usuarios" role="menuitem" onClick={cerrarMenus}>
+                                                <span aria-hidden="true">👤</span> Usuarios
                                             </Link>
                                         )}
-                                        {ROLES_EVALUAN.includes(user.rol) && (
-                                            <Link to="/arriendos" role="menuitem" onClick={cerrarMenus}>
-                                                <span aria-hidden="true">📝</span> Solicitudes de arriendo
-                                            </Link>
-                                        )}
-                                        {ROLES_GESTION.includes(user.rol) && (
-                                            <Link to="/propietarios" role="menuitem" onClick={cerrarMenus}>
-                                                <span aria-hidden="true">👤</span> Propietarios
-                                            </Link>
-                                        )}
-                                        {ROLES_ATENCION.includes(user.rol) && (
+                                        {ROLES_INTERNOS.includes(user.rol) && (
                                             <Link to="/clientes" role="menuitem" onClick={cerrarMenus}>
                                                 <span aria-hidden="true">👥</span> Clientes interesados
                                             </Link>
                                         )}
+
+                                        <Link to="/cuenta" role="menuitem" onClick={cerrarMenus}>
+                                            <span aria-hidden="true">⚙️</span> Mi cuenta
+                                        </Link>
 
                                         <button type="button" role="menuitem" onClick={handleLogout}>
                                             <span aria-hidden="true">⎋</span> Cerrar sesión

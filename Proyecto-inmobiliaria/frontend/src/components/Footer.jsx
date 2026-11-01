@@ -3,8 +3,6 @@ import { Link } from 'react-router-dom';
 const enlacesNavegacion = [
     { texto: 'Inicio', ruta: '/' },
     { texto: 'Propiedades', ruta: '/propiedades' },
-    { texto: 'Panel administrativo', ruta: '/dashboard' },
-    { texto: 'Solicitudes de visita', ruta: '/visitas' },
     { texto: 'Iniciar sesión', ruta: '/login' },
     { texto: 'Crear cuenta', ruta: '/registro' }
 ];
@@ -150,6 +148,10 @@ export default function Footer() {
 
             <div className="pie-inferior">
                 <p>© {anio} Gestión Urbana Propiedades. Todos los derechos reservados.</p>
+                <p className="pie-aviso" role="note">
+                    <strong>Proyecto académico.</strong> Las propiedades, cuentas, visitas y solicitudes
+                    precargadas son datos ficticios de demostración.
+                </p>
                 <div className="pie-legales">
                     <Link to="/privacidad">Privacidad</Link>
                     <Link to="/terminos">Términos de uso</Link>

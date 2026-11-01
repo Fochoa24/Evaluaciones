@@ -19,13 +19,12 @@ export default function ArriendoNuevo() {
     const { id: propiedadIdParam } = useParams();
     const navigate = useNavigate();
     const { user } = useAuth();
-    const { obtener, propiedades } = usePropiedades();
+    const { propiedades } = usePropiedades();
     const { crear } = useArriendos();
     const formRef = useRef(null);
 
-    const disponibles = propiedades.filter(
-        (item) => item.estado === 'Disponible' || item.estado === 'Publicada'
-    );
+    // RN-06: solo una propiedad Publicada recibe solicitudes.
+    const disponibles = propiedades.filter((item) => item.estado === 'Publicada');
 
     const [form, setForm] = useState(() => ({
         ...solicitudInicial,
@@ -57,57 +56,38 @@ export default function ArriendoNuevo() {
         }
     };
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
 
         const errores = {};
         if (!form.propiedadId) errores.propiedadId = 'Elige una propiedad.';
-        if (!form.clienteNombre.trim()) errores.clienteNombre = 'Ingresa tu nombre.';
-        if (!form.clienteEmail.trim()) errores.clienteEmail = 'Ingresa tu correo.';
         if (!form.ingresoMensual || Number(form.ingresoMensual) <= 0) {
             errores.ingresoMensual = 'Ingresa un ingreso mensual válido.';
         }
 
         if (Object.keys(errores).length > 0) {
             setErroresCampo(errores);
-            setMensaje('Completa los campos obligatorios.');
+            setMensaje({ texto: 'Completa los campos obligatorios.', tipo: 'error' });
             focoPrimerError(errores);
             return;
         }
 
-        const propiedad = obtener(form.propiedadId);
-        if (!propiedad) {
-            setMensaje({ texto: 'No se encontró la propiedad seleccionada.', tipo: 'error' });
-            return;
-        }
-
-        if (propiedad.estado !== 'Disponible' && propiedad.estado !== 'Publicada') {
-            setMensaje({
-                texto: 'Esa propiedad no está disponible para nuevas solicitudes.',
-                tipo: 'error'
-            });
-            return;
-        }
-
         setErroresCampo({});
-        crear({
-            propiedadId: propiedad.id,
-            propiedadTitulo: propiedad.titulo,
-            clienteNombre: form.clienteNombre.trim(),
-            clienteEmail: form.clienteEmail.trim(),
-            clienteTelefono: form.clienteTelefono.trim(),
+        // RN-06/RN-07 y F27: el backend valida la propiedad y toma nombre y correo de la cuenta.
+        const resultado = await crear({
+            propiedadId: Number(form.propiedadId),
+            telefono: form.clienteTelefono.trim(),
             ingresoMensual: Number(form.ingresoMensual),
-            garantia: form.garantia.trim() || 'Por definir',
-            antecedentes: form.antecedentes.trim() || 'Sin antecedentes adjuntos'
+            garantia: form.garantia.trim(),
+            antecedentes: form.antecedentes.trim()
         });
+        if (!resultado.ok) {
+            setMensaje({ texto: resultado.mensaje, tipo: 'error' });
+            return;
+        }
 
-        setMensaje({
-            texto: 'Solicitud de arriendo enviada. Un ejecutivo la evaluará.',
-            tipo: 'success'
-        });
-        setForm((prev) => ({ ...prev, ingresoMensual: '', garantia: '', antecedentes: '' }));
-
-        window.setTimeout(() => navigate('/arriendos'), 1200);
+        // F23: "Mis solicitudes" (/arriendos ya admite al cliente).
+        navigate('/arriendos');
     };
 
     return (
@@ -116,8 +96,8 @@ export default function ArriendoNuevo() {
                 <p className="etiqueta">ARRIENDO</p>
                 <h1>Solicitar arriendo de propiedad</h1>
                 <p className="subtitulo-login">
-                    Envía tus antecedentes para que un evaluador reserve la propiedad si aprueba la
-                    solicitud.
+                    Envía tus antecedentes: primero los evalúa el ejecutivo y después el propietario
+                    decide. Si ambos aprueban, la propiedad queda reservada para ti.
                 </p>
             </section>
 
@@ -163,7 +143,7 @@ export default function ArriendoNuevo() {
                             id="clienteNombre"
                             name="clienteNombre"
                             value={form.clienteNombre}
-                            onChange={handleChange}
+                            readOnly
                             required
                             autoComplete="name"
                             aria-invalid={erroresCampo.clienteNombre ? 'true' : undefined}
@@ -185,7 +165,7 @@ export default function ArriendoNuevo() {
                             id="clienteEmail"
                             name="clienteEmail"
                             value={form.clienteEmail}
-                            onChange={handleChange}
+                            readOnly
                             required
                             autoComplete="email"
                             aria-invalid={erroresCampo.clienteEmail ? 'true' : undefined}

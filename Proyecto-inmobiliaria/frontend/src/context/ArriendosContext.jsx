@@ -1,86 +1,65 @@
-import { createContext, useContext, useEffect, useState } from 'react';
-import { arriendosSemilla } from '../data/arriendos';
-import { guardar, leer } from '../services/storage';
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import { api, resultado } from '../services/api';
+import { useAuth } from './AuthContext';
 
 /**
- * Solicitudes de arriendo (RF9–RF11): el cliente envía antecedentes
- * y un evaluador aprueba (reserva la propiedad), rechaza o libera
- * la reserva. Persiste en `gi_arriendos`.
+ * Solicitudes de arriendo desde la API (/api/arriendos). El backend filtra
+ * por rol (§8), aplica la doble aprobación (§5.3) y agrega a cada solicitud
+ * sus `transiciones`. Las operaciones recargan la lista y devuelven
+ * { ok, mensaje, datos }.
  */
 const ArriendosContext = createContext(null);
 
 export function ArriendosProvider({ children }) {
-    const [arriendos, setArriendos] = useState(() => {
-        const guardados = leer('arriendos', null);
-        if (guardados) {
-            return guardados;
+    const { user } = useAuth();
+    const [arriendos, setArriendos] = useState([]);
+    const [cargando, setCargando] = useState(false);
+    const [error, setError] = useState('');
+
+    const recargar = useCallback(async () => {
+        if (!user || user.estado !== 'Activo' || user.debeCambiarPassword) {
+            setArriendos([]);
+            return;
         }
-        guardar('arriendos', arriendosSemilla);
-        return arriendosSemilla;
-    });
+        setCargando(true);
+        try {
+            setArriendos(await api('/api/arriendos'));
+            setError('');
+        } catch (e) {
+            setError(e.message);
+        } finally {
+            setCargando(false);
+        }
+    }, [user]);
 
     useEffect(() => {
-        guardar('arriendos', arriendos);
-    }, [arriendos]);
+        recargar();
+    }, [recargar]);
+
+    const operar = async (promesa) => {
+        const r = await resultado(promesa);
+        if (r.ok) await recargar();
+        return r;
+    };
+
+    /** Solo clientes. @param {{propiedadId: number, ingresoMensual: number, garantia?: string, antecedentes?: string, telefono?: string}} datos */
+    const crear = (datos) => operar(api('/api/arriendos', { method: 'POST', body: datos }));
 
     /**
-     * Registra una nueva solicitud en estado Pendiente.
-     * @param {object} datos - propiedadId, clienteNombre, ingresoMensual, ...
-     * @returns {object} Solicitud creada.
+     * @param {number} id @param {string} estado - Uno de `transiciones`.
+     * @param {{motivo?: string, observaciones?: string, motivoPropietario?: string}} [extras]
      */
-    const crear = (datos) => {
-        const id = siguienteId(arriendos);
-        const nueva = {
-            id,
-            estado: 'Pendiente',
-            observacionesEjecutivo: '',
-            motivo: '',
-            creadaEn: new Date().toISOString(),
-            evaluadaEn: null,
-            ...datos
-        };
-        setArriendos((prev) => [nueva, ...prev]);
-        return nueva;
-    };
+    const cambiarEstado = (id, estado, extras = {}) =>
+        operar(api(`/api/arriendos/${id}/estado`, { method: 'POST', body: { estado, ...extras } }));
 
-    /**
-     * Cambia el estado de evaluación y opcionalmente observaciones/motivo.
-     * @param {string|number} id @param {string} estado @param {object} [extras]
-     */
-    const actualizarEstado = (id, estado, extras = {}) => {
-        setArriendos((prev) =>
-            prev.map((item) =>
-                item.id === Number(id)
-                    ? {
-                          ...item,
-                          estado,
-                          evaluadaEn: new Date().toISOString(),
-                          ...extras
-                      }
-                    : item
-            )
-        );
-    };
-
-    /** @param {string|number} id */
-    const eliminar = (id) => {
-        setArriendos((prev) => prev.filter((item) => item.id !== Number(id)));
-    };
+    /** Solo admin. @param {number} id */
+    const eliminar = (id) => operar(api(`/api/arriendos/${id}`, { method: 'DELETE' }));
 
     return (
-        <ArriendosContext.Provider value={{ arriendos, crear, actualizarEstado, eliminar }}>
+        <ArriendosContext.Provider value={{ arriendos, cargando, error, recargar, crear, cambiarEstado, eliminar }}>
             {children}
         </ArriendosContext.Provider>
     );
-}
-
-/**
- * Siguiente id autoincremental en una lista con campo `id`.
- * @param {Array<{id: number}>} lista
- * @returns {number}
- */
-function siguienteId(lista) {
-    return lista.reduce((max, item) => Math.max(max, item.id), 0) + 1;
 }
 
 export function useArriendos() {

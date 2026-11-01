@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import Hero from '../components/Hero';
 import PropiedadCard from '../components/PropiedadCard';
-import { propiedades } from '../data/propiedades';
+import { usePropiedades } from '../context/PropiedadesContext';
 
 const servicios = [
     {
@@ -96,10 +96,6 @@ const pasos = [
     }
 ];
 
-const destacadas = propiedades
-    .filter((item) => item.estado === 'Disponible')
-    .slice(0, 3);
-
 const metricas = [
     { valor: '120+', etiqueta: 'Propiedades gestionadas' },
     { valor: '15', etiqueta: 'Comunas en Santiago' },
@@ -108,6 +104,9 @@ const metricas = [
 ];
 
 export default function Home() {
+    const { propiedades } = usePropiedades();
+    const destacadas = propiedades.filter((item) => item.estado === 'Publicada').slice(0, 3);
+
     return (
         <main>
             <Hero>

@@ -5,15 +5,21 @@ import { usePropiedades } from '../context/PropiedadesContext';
 export default function PropiedadEditar() {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { obtener, actualizar } = usePropiedades();
+    const { obtener, actualizar, cargando } = usePropiedades();
     const propiedad = obtener(id);
 
-    if (!propiedad) {
+    if (!propiedad?.puedeEditar) {
         return (
             <main className="seccion">
-                <p className="mensaje error visible" role="alert">
-                    No se encontró la propiedad solicitada.
-                </p>
+                {cargando ? (
+                    <p role="status">Cargando propiedad...</p>
+                ) : (
+                    <p className="mensaje error visible" role="alert">
+                        {propiedad
+                            ? `No puedes editar esta propiedad (${propiedad.estado}).`
+                            : 'No se encontró la propiedad solicitada.'}
+                    </p>
+                )}
                 <Link to="/propiedades" className="boton boton-ver">
                     Volver al catálogo
                 </Link>
@@ -21,9 +27,15 @@ export default function PropiedadEditar() {
         );
     }
 
-    const handleSubmit = (valores) => {
-        actualizar(propiedad.id, valores);
-        navigate(`/propiedades/${propiedad.id}`);
+    const handleSubmit = async (valores) => {
+        const resultado = await actualizar(propiedad.id, valores);
+        if (resultado.ok) {
+            const aviso = resultado.datos.volvioARevision
+                ? 'Cambios guardados. La propiedad vuelve a revisión (Disponible) hasta que el ejecutivo la publique de nuevo.'
+                : 'Cambios guardados.';
+            navigate(`/propiedades/${propiedad.id}`, { state: { aviso: { texto: aviso, tipo: 'success' } } });
+        }
+        return resultado;
     };
 
     return (

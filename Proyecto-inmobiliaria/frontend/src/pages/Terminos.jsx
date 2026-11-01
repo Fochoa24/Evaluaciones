@@ -1,6 +1,6 @@
 import LayoutLegal from '../components/LayoutLegal';
 
-const FECHA = '23 de septiembre de 2026';
+const FECHA = '1 de noviembre de 2026';
 
 export default function Terminos() {
     return (
@@ -42,15 +42,21 @@ export default function Terminos() {
                 <li>No publicar contenido falso, ofensivo o engañoso</li>
             </ul>
 
-            <h2>5. Propiedades y solicitudes de visita</h2>
+            <h2>5. Propiedades, visitas y arriendos</h2>
             <ul>
                 <li>
                     La información de propiedades publicadas debe ser veraz en la medida de lo
-                    posible
+                    posible; los cambios que haga el propietario se revisan antes de volver a
+                    publicarse
                 </li>
                 <li>
                     Una solicitud de visita no constituye una reserva ni un contrato de arriendo;
-                    la visita queda sujeta a confirmación
+                    la visita queda sujeta a confirmación del ejecutivo a cargo
+                </li>
+                <li>
+                    Una solicitud de arriendo requiere la aprobación del ejecutivo y luego la del
+                    propietario, que tiene 5 días hábiles para responder. Solo con ambas la
+                    propiedad queda reservada; la reserva no reemplaza la firma del contrato
                 </li>
                 <li>
                     Los precios y estados pueden cambiar sin previo aviso

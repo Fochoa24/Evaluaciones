@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
-import { ESTADOS_PROPIEDAD, IMAGEN_DEFECTO, TIPOS_PROPIEDAD } from '../data/propiedades';
-import { usePropietarios } from '../context/PropietariosContext';
+import { useAuth } from '../context/AuthContext';
+import { TIPOS_PROPIEDAD } from '../data/propiedades';
+import { api } from '../services/api';
 import Mensaje from './Mensaje';
 
 const valoresPorDefecto = {
@@ -17,7 +18,7 @@ const valoresPorDefecto = {
     superficie: '',
     caracteristicas: '',
     propietarioId: '',
-    estado: 'Disponible',
+    ejecutivoId: '',
     imagen: ''
 };
 
@@ -48,25 +49,44 @@ function normalizar(valores) {
         caracteristicas: Array.isArray(base.caracteristicas)
             ? base.caracteristicas.join(', ')
             : String(base.caracteristicas ?? ''),
-        propietarioId:
-            base.propietarioId === '' || base.propietarioId == null
-                ? ''
-                : String(base.propietarioId),
-        estado: base.estado || 'Disponible',
+        propietarioId: base.propietarioId == null ? '' : String(base.propietarioId),
+        ejecutivoId: base.ejecutivoId == null ? '' : String(base.ejecutivoId),
         imagen: String(base.imagen ?? '')
     };
 }
 
+/**
+ * Formulario de alta y edición. El estado no se edita aquí (nace Disponible
+ * y cambia con las acciones del detalle, §5.1). Internos eligen al dueño al
+ * crear; el admin además elige o reasigna al ejecutivo (o "Automático").
+ * `onSubmit` es async y puede devolver { ok, mensaje } para mostrar el error.
+ */
 export default function PropiedadForm({ valoresIniciales, onSubmit, textoBoton = 'Guardar' }) {
-    const { propietarios } = usePropietarios();
+    const { user } = useAuth();
+    const edicion = Boolean(valoresIniciales?.id);
+    const esAdmin = user?.rol === 'admin';
+    const mostrarDueno = esAdmin || (user?.rol === 'ejecutivo' && !edicion);
     const [form, setForm] = useState(() => normalizar(valoresIniciales));
     const [mensaje, setMensaje] = useState('');
     const [erroresCampo, setErroresCampo] = useState({});
+    const [propietarios, setPropietarios] = useState([]);
+    const [ejecutivos, setEjecutivos] = useState([]);
+    const [enviando, setEnviando] = useState(false);
     const formRef = useRef(null);
 
     useEffect(() => {
         setForm(() => normalizar(valoresIniciales));
     }, [valoresIniciales]);
+
+    // Solo cuentas activas pueden ser dueño o responsable (RN-11).
+    useEffect(() => {
+        if (mostrarDueno) {
+            api('/api/usuarios?rol=propietario&estado=Activo').then(setPropietarios).catch(() => {});
+        }
+        if (esAdmin) {
+            api('/api/usuarios?rol=ejecutivo&estado=Activo').then(setEjecutivos).catch(() => {});
+        }
+    }, [mostrarDueno, esAdmin]);
 
     const handleChange = (event) => {
         const { name, value } = event.target;
@@ -88,12 +108,13 @@ export default function PropiedadForm({ valoresIniciales, onSubmit, textoBoton =
         }
     };
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
 
         const errores = {};
         if (!form.titulo.trim()) errores.titulo = 'El título es obligatorio.';
         if (!form.comuna.trim()) errores.comuna = 'La comuna es obligatoria.';
+        if (mostrarDueno && !form.propietarioId) errores.propietarioId = 'Elige el propietario.';
 
         const precio = Number(form.precioMensual);
         if (!Number.isFinite(precio) || precio <= 0) {
@@ -125,12 +146,14 @@ export default function PropiedadForm({ valoresIniciales, onSubmit, textoBoton =
             .map((item) => item.trim())
             .filter(Boolean);
 
-        onSubmit({
+        setEnviando(true);
+        const resultado = await onSubmit({
             titulo: form.titulo.trim(),
             tipo: form.tipo,
             comuna: form.comuna.trim(),
             direccion: form.direccion.trim(),
-            ubicacion: form.ubicacion.trim() || `${form.comuna.trim()}, Santiago`,
+            // F24/F26: sin valores inventados; la tarjeta usa la imagen de respaldo al mostrar.
+            ubicacion: form.ubicacion.trim(),
             precioMensual: precio,
             gastosComunes,
             dormitorios: Number(form.dormitorios) || 0,
@@ -138,10 +161,15 @@ export default function PropiedadForm({ valoresIniciales, onSubmit, textoBoton =
             estacionamientos: Number(form.estacionamientos) || 0,
             superficie,
             caracteristicas,
-            propietarioId: form.propietarioId ? Number(form.propietarioId) : null,
-            estado: form.estado,
-            imagen: form.imagen.trim() || IMAGEN_DEFECTO
+            imagen: form.imagen.trim(),
+            ...(mostrarDueno && { propietarioId: Number(form.propietarioId) }),
+            // Vacío = automático (menor carga, RN-12).
+            ...(esAdmin && form.ejecutivoId && { ejecutivoId: Number(form.ejecutivoId) })
         });
+        setEnviando(false);
+        if (resultado && !resultado.ok) {
+            setMensaje(resultado.mensaje);
+        }
     };
 
     return (
@@ -178,17 +206,6 @@ export default function PropiedadForm({ valoresIniciales, onSubmit, textoBoton =
                     {TIPOS_PROPIEDAD.map((tipo) => (
                         <option key={tipo} value={tipo}>
                             {tipo}
-                        </option>
-                    ))}
-                </select>
-            </div>
-
-            <div className="campo">
-                <label htmlFor="estado">Estado</label>
-                <select id="estado" name="estado" value={form.estado} onChange={handleChange} required>
-                    {ESTADOS_PROPIEDAD.map((estado) => (
-                        <option key={estado} value={estado}>
-                            {estado}
                         </option>
                     ))}
                 </select>
@@ -336,22 +353,48 @@ export default function PropiedadForm({ valoresIniciales, onSubmit, textoBoton =
                 />
             </div>
 
-            <div className="campo">
-                <label htmlFor="propietarioId">Propietario</label>
-                <select
-                    id="propietarioId"
-                    name="propietarioId"
-                    value={form.propietarioId}
-                    onChange={handleChange}
-                >
-                    <option value="">Sin propietario asignado</option>
-                    {propietarios.map((dueno) => (
-                        <option key={dueno.id} value={dueno.id}>
-                            {dueno.nombre}
+            {mostrarDueno && (
+                <div className="campo">
+                    <label htmlFor="propietarioId">Propietario</label>
+                    <select
+                        id="propietarioId"
+                        name="propietarioId"
+                        value={form.propietarioId}
+                        onChange={handleChange}
+                        required
+                        aria-invalid={erroresCampo.propietarioId ? 'true' : undefined}
+                        aria-describedby={erroresCampo.propietarioId ? 'propietarioId-error' : undefined}
+                    >
+                        <option value="" disabled>
+                            Elige un propietario activo
                         </option>
-                    ))}
-                </select>
-            </div>
+                        {propietarios.map((dueno) => (
+                            <option key={dueno.id} value={dueno.id}>
+                                {dueno.nombre}
+                            </option>
+                        ))}
+                    </select>
+                    {erroresCampo.propietarioId && (
+                        <span id="propietarioId-error" className="error-campo">
+                            {erroresCampo.propietarioId}
+                        </span>
+                    )}
+                </div>
+            )}
+
+            {esAdmin && (
+                <div className="campo">
+                    <label htmlFor="ejecutivoId">Ejecutivo responsable</label>
+                    <select id="ejecutivoId" name="ejecutivoId" value={form.ejecutivoId} onChange={handleChange}>
+                        {!edicion && <option value="">Automático (menor carga)</option>}
+                        {ejecutivos.map((ejecutivo) => (
+                            <option key={ejecutivo.id} value={ejecutivo.id}>
+                                {ejecutivo.nombre} ({ejecutivo.cartera} en cartera)
+                            </option>
+                        ))}
+                    </select>
+                </div>
+            )}
 
             <div className="campo campo-completo">
                 <label htmlFor="caracteristicas">Características (separadas por coma)</label>
@@ -382,7 +425,7 @@ export default function PropiedadForm({ valoresIniciales, onSubmit, textoBoton =
             </div>
 
             <div className="campo-completo acciones-formulario">
-                <button type="submit" className="boton">
+                <button type="submit" className="boton" disabled={enviando}>
                     {textoBoton}
                 </button>
             </div>

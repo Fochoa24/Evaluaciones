@@ -1,6 +1,6 @@
 import LayoutLegal from '../components/LayoutLegal';
 
-const FECHA = '23 de septiembre de 2026';
+const FECHA = '1 de noviembre de 2026';
 
 export default function Cookies() {
     return (
@@ -29,15 +29,14 @@ export default function Cookies() {
 
             <h2>3. Almacenamiento local (localStorage)</h2>
             <p>
-                Para que la aplicación funcione (sesión, propiedades y visitas) usamos
-                almacenamiento local con prefijo <code>gi_</code>:
+                Los datos de propiedades, visitas y solicitudes viven en nuestros servidores. En tu
+                navegador solo guardamos la sesión, con prefijo <code>gi_</code>:
             </p>
             <ul>
-                <li><code>gi_sesion</code> — usuario con sesión iniciada</li>
-                <li><code>gi_usuarios</code> — cuentas registradas en el navegador</li>
-                <li><code>gi_propiedades</code> — catálogo de propiedades</li>
-                <li><code>gi_visitas</code> — solicitudes de visita</li>
+                <li><code>gi_token</code> — credencial de la sesión iniciada (vence en 8 horas)</li>
+                <li><code>gi_sesion</code> — datos básicos del usuario con sesión iniciada (sin RUT)</li>
             </ul>
+            <p>Ambos se borran al cerrar sesión.</p>
             <p>
                 Esto <strong>no es una cookie</strong>, pero se guarda en tu equipo. Si rechazas
                 las cookies, el avance no volverá a aparecer; el almacenamiento esencial de la app

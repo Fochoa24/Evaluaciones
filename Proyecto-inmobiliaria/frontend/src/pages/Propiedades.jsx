@@ -1,11 +1,9 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import AvisoFicticio from '../components/AvisoFicticio';
 import Mensaje from '../components/Mensaje';
 import PropiedadCard from '../components/PropiedadCard';
 import { useAuth } from '../context/AuthContext';
 import { usePropiedades } from '../context/PropiedadesContext';
-import { usePropietarios } from '../context/PropietariosContext';
 import { filtrarPropiedades } from '../services/filtros';
 import { ROLES_GESTION } from '../data/roles';
 
@@ -20,30 +18,25 @@ const filtrosIniciales = {
 
 export default function Propiedades() {
     const { user } = useAuth();
-    const { propiedades } = usePropiedades();
-    const { propietarios } = usePropietarios();
+    const { propiedades, cargando, error } = usePropiedades();
     const [filtros, setFiltros] = useState(filtrosIniciales);
     const [filtrosAplicados, setFiltrosAplicados] = useState(filtrosIniciales);
     const [mensaje, setMensaje] = useState({ texto: '', tipo: 'success' });
 
-    const propietarioLogueado = useMemo(() => {
-        if (!user) return null;
-        return propietarios.find((item) => item.usuarioId === user.id) || null;
-    }, [propietarios, user]);
-
+    // La API ya filtra por rol; el propietario ve aquí solo las suyas (D3).
     const basePropiedades = useMemo(() => {
-        if (user?.rol === 'propietario' && propietarioLogueado) {
-            return propiedades.filter((item) => item.propietarioId === propietarioLogueado.id);
+        if (user?.rol === 'propietario') {
+            return propiedades.filter((item) => item.propietarioId === user.id);
         }
         return propiedades;
-    }, [propiedades, propietarioLogueado, user]);
+    }, [propiedades, user]);
 
     const resultados = useMemo(
         () => filtrarPropiedades(basePropiedades, filtrosAplicados),
         [basePropiedades, filtrosAplicados]
     );
 
-    const puedeGestionar = user && ROLES_GESTION.includes(user.rol);
+    const puedeGestionar = user?.estado === 'Activo' && ROLES_GESTION.includes(user.rol);
 
     const handleChange = (event) => {
         const { name, value } = event.target;
@@ -89,7 +82,6 @@ export default function Propiedades() {
                 )}
             </section>
 
-            <AvisoFicticio texto="El inventario, precios y estados del catálogo son datos ficticios de demostración académica." />
 
             <section className="contenedor-filtros" aria-label="Filtros de búsqueda">
                 <form onSubmit={aplicarFiltros} className="bar-filtros" role="search">
@@ -195,7 +187,13 @@ export default function Propiedades() {
             </section>
 
             <section className="propiedades-grilla" aria-live="polite" aria-label="Resultados de propiedades">
-                {resultados.length ? (
+                {cargando ? (
+                    <p role="status">Cargando propiedades...</p>
+                ) : error ? (
+                    <div className="mensaje error visible" role="alert">
+                        {error}
+                    </div>
+                ) : resultados.length ? (
                     resultados.map((propiedad) => (
                         <PropiedadCard key={propiedad.id} propiedad={propiedad} />
                     ))

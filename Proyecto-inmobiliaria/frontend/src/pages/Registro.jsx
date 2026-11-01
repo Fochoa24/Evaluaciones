@@ -1,12 +1,14 @@
 import { useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import Mensaje from '../components/Mensaje';
 import { useAuth } from '../context/AuthContext';
+import { rutValido } from '../services/rut';
 
 const registroInicial = {
     nombre: '',
     usuario: '',
     email: '',
+    rut: '',
     telefono: '',
     password: '',
     confirmar: '',
@@ -14,11 +16,11 @@ const registroInicial = {
 };
 
 export default function Registro() {
-    const navigate = useNavigate();
     const { registrar } = useAuth();
     const [datos, setDatos] = useState(registroInicial);
     const [mensaje, setMensaje] = useState({ texto: '', tipo: 'error' });
     const [erroresCampo, setErroresCampo] = useState({});
+    const [enviando, setEnviando] = useState(false);
     const formRef = useRef(null);
 
     const handleChange = (event) => {
@@ -41,13 +43,15 @@ export default function Registro() {
         }
     };
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
 
         const errores = {};
         if (!datos.nombre.trim()) errores.nombre = 'Ingresa tu nombre completo.';
         if (!datos.usuario.trim()) errores.usuario = 'Ingresa un usuario.';
         if (!datos.email.trim()) errores.email = 'Ingresa tu correo electrónico.';
+        if (!datos.rut.trim()) errores.rut = 'Ingresa tu RUT.';
+        else if (!rutValido(datos.rut)) errores.rut = 'El RUT no es válido. Revisa el dígito verificador.';
         if (!datos.password) errores.password = 'Ingresa una contraseña.';
         if (datos.password && datos.password.length < 6) {
             errores.password = 'La contraseña debe tener al menos 6 caracteres.';
@@ -64,18 +68,21 @@ export default function Registro() {
         }
 
         setErroresCampo({});
-        const resultado = registrar(datos);
+        setEnviando(true);
+        const resultado = await registrar(datos);
+        setEnviando(false);
 
         if (!resultado.ok) {
             setMensaje({ texto: resultado.mensaje, tipo: 'error' });
             return;
         }
 
-        setMensaje({ texto: resultado.mensaje, tipo: 'success' });
-
-        setTimeout(() => {
-            navigate('/dashboard', { replace: true });
-        }, 800);
+        // Sin sesión: la cuenta queda Pendiente hasta abrir el enlace del correo.
+        setDatos(registroInicial);
+        setMensaje({
+            texto: `${resultado.mensaje} Revisa tu bandeja de entrada (y spam); el enlace vence en 24 horas.`,
+            tipo: 'success'
+        });
     };
 
     return (
@@ -149,6 +156,30 @@ export default function Registro() {
                     </div>
 
                     <div className="campo">
+                        <label htmlFor="rut">RUT</label>
+                        <input
+                            type="text"
+                            id="rut"
+                            name="rut"
+                            placeholder="Ej: 12.345.678-5"
+                            value={datos.rut}
+                            onChange={handleChange}
+                            required
+                            inputMode="text"
+                            autoComplete="off"
+                            aria-invalid={erroresCampo.rut ? 'true' : undefined}
+                            aria-describedby={erroresCampo.rut ? 'rut-error' : 'rut-ayuda'}
+                        />
+                        {erroresCampo.rut ? (
+                            <span id="rut-error" className="error-campo">
+                                {erroresCampo.rut}
+                            </span>
+                        ) : (
+                            <small id="rut-ayuda">Dato privado: solo lo ve el equipo de la inmobiliaria.</small>
+                        )}
+                    </div>
+
+                    <div className="campo">
                         <label htmlFor="telefono">Teléfono (opcional)</label>
                         <input
                             type="tel"
@@ -210,12 +241,14 @@ export default function Registro() {
                         <select id="rol" name="rol" value={datos.rol} onChange={handleChange} required>
                             <option value="cliente">Cliente / Arrendatario</option>
                             <option value="propietario">Propietario</option>
-                            <option value="ejecutivo">Ejecutivo Inmobiliario</option>
                         </select>
+                        {datos.rol === 'propietario' && (
+                            <small>Un ejecutivo verificará tus datos antes de que puedas publicar propiedades.</small>
+                        )}
                     </div>
 
-                    <button type="submit" className="boton boton-login">
-                        Crear cuenta
+                    <button type="submit" className="boton boton-login" disabled={enviando}>
+                        {enviando ? 'Creando cuenta...' : 'Crear cuenta'}
                     </button>
 
                     <Mensaje texto={mensaje.texto} tipo={mensaje.tipo} />

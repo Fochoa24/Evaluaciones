@@ -1,236 +1,195 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import AvisoFicticio from '../components/AvisoFicticio';
 import { useArriendos } from '../context/ArriendosContext';
 import { useAuth } from '../context/AuthContext';
-import { usePropiedades } from '../context/PropiedadesContext';
 import { ESTADOS_ARRIENDO, MOTIVOS_ARRIENDO } from '../data/flujo';
-import { ROLES_EVALUAN } from '../data/roles';
+import { ROLES_INTERNOS } from '../data/roles';
 
 const CLASES_BADGE = {
     Pendiente: 'reservada',
     'En evaluación': 'reservada',
+    'Esperando propietario': 'reservada',
     Aprobada: 'disponible',
+    Finalizada: 'disponible',
     Rechazada: 'vendida',
+    Vencida: 'vendida',
     Cancelada: 'vendida'
 };
 
+/** Texto del botón para cada destino de `transiciones`. */
+function etiqueta(solicitud, destino) {
+    if (destino === 'Cancelada') return solicitud.estado === 'Aprobada' ? 'Liberar reserva' : 'Cancelar';
+    return {
+        Pendiente: 'Reactivar',
+        'En evaluación': 'Tomar en evaluación',
+        'Esperando propietario': 'Aprobar',
+        Aprobada: 'Aceptar',
+        Rechazada: 'Rechazar'
+    }[destino];
+}
+
+const fecha = (iso) => (iso ? new Date(iso).toLocaleDateString('es-CL', { dateStyle: 'medium' }) : '');
+const pesos = (n) => `$${Number(n || 0).toLocaleString('es-CL')}`;
+
+/**
+ * Solicitudes de arriendo según el rol (§8): el ejecutivo evalúa las de su
+ * cartera (primera aprobación, con motivo); el propietario acepta o rechaza
+ * las que esperan su respuesta, sin ver contacto ni datos financieros; el
+ * cliente sigue las suyas ("Mis solicitudes"), las cancela o reactiva.
+ */
 export default function Arriendos() {
-    const { arriendos, actualizarEstado, eliminar } = useArriendos();
-    const { obtener, actualizar } = usePropiedades();
     const { user } = useAuth();
+    const { arriendos, cargando, error, cambiarEstado, eliminar } = useArriendos();
     const [filtroEstado, setFiltroEstado] = useState('');
-    const [editandoId, setEditandoId] = useState(null);
-    const [formEvaluacion, setFormEvaluacion] = useState({ observaciones: '', motivo: '' });
+    // Evaluación del ejecutivo: { id, motivo, observaciones }
+    const [evaluando, setEvaluando] = useState(null);
     const [mensaje, setMensaje] = useState({ texto: '', tipo: 'success' });
 
-    const puedeEvaluar = user && ROLES_EVALUAN.includes(user.rol);
+    const interno = ROLES_INTERNOS.includes(user.rol);
+    const esCliente = user.rol === 'cliente';
+    const esPropietario = user.rol === 'propietario';
+    const solicitudes = filtroEstado ? arriendos.filter((item) => item.estado === filtroEstado) : arriendos;
 
-    const solicitudes = useMemo(() => {
-        return filtroEstado
-            ? arriendos.filter((item) => item.estado === filtroEstado)
-            : arriendos;
-    }, [arriendos, filtroEstado]);
+    const informar = (r, exito) =>
+        setMensaje(r.ok ? { texto: exito, tipo: 'success' } : { texto: r.mensaje, tipo: 'error' });
 
-    const abrirEvaluacion = (solicitud) => {
-        setEditandoId(solicitud.id);
-        setFormEvaluacion({
-            observaciones: solicitud.observacionesEjecutivo || '',
-            motivo: solicitud.motivo || ''
-        });
-        setMensaje({ texto: '', tipo: 'success' });
-    };
-
-    const cancelarEvaluacion = () => {
-        setEditandoId(null);
-    };
-
-    const pasarEnEvaluacion = (solicitud) => {
-        actualizarEstado(solicitud.id, 'En evaluación', {
-            observacionesEjecutivo: formEvaluacion.observaciones
-        });
-        setEditandoId(null);
-        setMensaje({
-            texto: `Solicitud de ${solicitud.clienteNombre} pasa a evaluación.`,
-            tipo: 'success'
-        });
-    };
-
-    const aprobar = (solicitud) => {
-        const propiedad = obtener(solicitud.propiedadId);
-        if (propiedad && propiedad.estado !== 'Arrendada') {
-            actualizar(propiedad.id, { estado: 'Reservada' });
+    const aplicar = async (solicitud, destino, extras = {}) => {
+        // El ejecutivo aprueba o rechaza con motivo: abre el formulario de evaluación.
+        if (interno && ['Esperando propietario', 'Rechazada'].includes(destino) && !extras.motivo) {
+            setEvaluando({ id: solicitud.id, motivo: solicitud.motivo || '', observaciones: solicitud.observacionesEjecutivo || '' });
+            return;
         }
-        actualizarEstado(solicitud.id, 'Aprobada', {
-            observacionesEjecutivo:
-                formEvaluacion.observaciones || 'Aprobada. Propiedad reservada.',
-            motivo: formEvaluacion.motivo
-        });
-        setEditandoId(null);
-        setMensaje({
-            texto: `Solicitud aprobada. La propiedad "${solicitud.propiedadTitulo}" queda Reservada.`,
-            tipo: 'success'
-        });
-    };
-
-    const rechazar = (solicitud) => {
-        actualizarEstado(solicitud.id, 'Rechazada', {
-            observacionesEjecutivo: formEvaluacion.observaciones,
-            motivo: formEvaluacion.motivo || 'No cumple antecedentes'
-        });
-        setEditandoId(null);
-        setMensaje({
-            texto: `Solicitud de ${solicitud.clienteNombre} rechazada.`,
-            tipo: 'success'
-        });
-    };
-
-    const cancelarSolicitud = (solicitud) => {
-        actualizarEstado(solicitud.id, 'Cancelada', {
-            observacionesEjecutivo: formEvaluacion.observaciones
-        });
-        setEditandoId(null);
-        setMensaje({
-            texto: `Solicitud de ${solicitud.clienteNombre} cancelada.`,
-            tipo: 'success'
-        });
-    };
-
-    const liberarReserva = (solicitud) => {
-        const propiedad = obtener(solicitud.propiedadId);
-        if (propiedad && propiedad.estado === 'Reservada') {
-            actualizar(propiedad.id, { estado: 'Disponible' });
+        if (esPropietario && destino === 'Rechazada') {
+            const motivoPropietario = window.prompt('Motivo del rechazo (opcional):', '');
+            if (motivoPropietario === null) return;
+            extras = { motivoPropietario };
+        } else if (['Cancelada', 'Aprobada'].includes(destino)) {
+            const efecto = destino === 'Aprobada'
+                ? ' La propiedad quedará reservada y las demás solicitudes se rechazarán.'
+                : solicitud.estado === 'Aprobada' ? ' La propiedad vuelve al catálogo.' : '';
+            if (!window.confirm(`¿${etiqueta(solicitud, destino)} la solicitud de ${solicitud.clienteNombre}?${efecto}`)) return;
         }
-        actualizarEstado(solicitud.id, 'Cancelada', {
-            observacionesEjecutivo: 'Reserva liberada. Propiedad disponible de nuevo.'
-        });
-        setEditandoId(null);
-        setMensaje({
-            texto: `Reserva liberada para "${solicitud.propiedadTitulo}".`,
-            tipo: 'success'
-        });
+        const r = await cambiarEstado(solicitud.id, destino, extras);
+        const extra = r.datos?.rechazadas ? ` ${r.datos.rechazadas} solicitud(es) más quedaron rechazadas.` : '';
+        informar(r, `Solicitud ${destino === 'Esperando propietario' ? 'enviada al propietario' : `ahora ${destino}`}.${extra}`);
+        if (r.ok) setEvaluando(null);
     };
 
-    const eliminarSolicitud = (solicitud) => {
-        if (window.confirm(`¿Eliminar la solicitud de ${solicitud.clienteNombre}?`)) {
-            eliminar(solicitud.id);
-            setMensaje({ texto: 'Solicitud eliminada.', tipo: 'success' });
+    const enviarEvaluacion = (solicitud, destino) => {
+        if (!evaluando.motivo) {
+            setMensaje({ texto: 'Elige el motivo de la evaluación.', tipo: 'error' });
+            return;
         }
+        aplicar(solicitud, destino, { motivo: evaluando.motivo, observaciones: evaluando.observaciones });
     };
 
-    const acciones = (solicitud) => {
-        const items = [];
+    const eliminarSolicitud = async (solicitud) => {
+        if (!window.confirm(`¿Eliminar definitivamente la solicitud de ${solicitud.clienteNombre}?`)) return;
+        informar(await eliminar(solicitud.id), 'Solicitud eliminada.');
+    };
 
-        if (puedeEvaluar) {
-            if (['Pendiente', 'En evaluación'].includes(solicitud.estado)) {
-                items.push(
-                    <button
-                        key="evaluar"
-                        type="button"
-                        className="boton boton-mini"
-                        onClick={() => abrirEvaluacion(solicitud)}
-                        aria-label={`Evaluar solicitud de ${solicitud.clienteNombre}`}
-                    >
-                        Evaluar
-                    </button>
-                );
-            }
-
-            if (editandoId === solicitud.id) {
-                if (solicitud.estado === 'Pendiente') {
-                    items.push(
-                        <button
-                            key="en-eval"
-                            type="button"
-                            className="boton boton-mini boton-secundario"
-                            onClick={() => pasarEnEvaluacion(solicitud)}
-                        >
-                            En evaluación
-                        </button>
-                    );
-                }
-                items.push(
-                    <button
-                        key="aprobar"
-                        type="button"
-                        className="boton boton-mini"
-                        onClick={() => aprobar(solicitud)}
-                        aria-label={`Aprobar y reservar por solicitud de ${solicitud.clienteNombre}`}
-                    >
-                        Aprobar
-                    </button>,
-                    <button
-                        key="rechazar"
-                        type="button"
-                        className="boton boton-mini boton-secundario"
-                        onClick={() => rechazar(solicitud)}
-                        aria-label={`Rechazar solicitud de ${solicitud.clienteNombre}`}
-                    >
-                        Rechazar
-                    </button>
-                );
-            }
-
-            if (solicitud.estado === 'Aprobada') {
-                items.push(
-                    <button
-                        key="liberar"
-                        type="button"
-                        className="boton boton-mini boton-secundario"
-                        onClick={() => liberarReserva(solicitud)}
-                        aria-label={`Liberar reserva de ${solicitud.propiedadTitulo}`}
-                    >
-                        Liberar reserva
-                    </button>
-                );
-            }
-        }
-
-        if (['Pendiente', 'En evaluación'].includes(solicitud.estado)) {
-            items.push(
-                <button
-                    key="cancelar"
-                    type="button"
-                    className="boton boton-mini boton-secundario"
-                    onClick={() => cancelarSolicitud(solicitud)}
-                    aria-label={`Cancelar solicitud de ${solicitud.clienteNombre}`}
-                >
-                    Cancelar
-                </button>
-            );
-        }
-
-        items.push(
-            <button
-                key="eliminar"
-                type="button"
-                className="boton boton-mini boton-peligro"
-                onClick={() => eliminarSolicitud(solicitud)}
-                aria-label={`Eliminar solicitud de ${solicitud.clienteNombre}`}
+    const formularioEvaluacion = (solicitud) => (
+        <div className="edicion-visita">
+            <label className="visually-hidden" htmlFor={`motivo-${solicitud.id}`}>Motivo</label>
+            <select
+                id={`motivo-${solicitud.id}`}
+                value={evaluando.motivo}
+                onChange={(e) => setEvaluando((prev) => ({ ...prev, motivo: e.target.value }))}
             >
-                Eliminar
-            </button>
-        );
+                {MOTIVOS_ARRIENDO.map((motivo) => (
+                    <option key={motivo} value={motivo}>{motivo || 'Elige el motivo'}</option>
+                ))}
+            </select>
+            <label className="visually-hidden" htmlFor={`obs-${solicitud.id}`}>Observaciones internas</label>
+            <input
+                type="text"
+                id={`obs-${solicitud.id}`}
+                placeholder="Observaciones internas (el dueño no las ve)"
+                value={evaluando.observaciones}
+                onChange={(e) => setEvaluando((prev) => ({ ...prev, observaciones: e.target.value }))}
+            />
+            <div className="acciones-tabla">
+                {solicitud.transiciones.includes('Esperando propietario') && (
+                    <button type="button" className="boton boton-mini" onClick={() => enviarEvaluacion(solicitud, 'Esperando propietario')}>
+                        Aprobar y enviar al dueño
+                    </button>
+                )}
+                <button type="button" className="boton boton-mini boton-secundario" onClick={() => enviarEvaluacion(solicitud, 'Rechazada')}>
+                    Rechazar
+                </button>
+                <button type="button" className="boton boton-mini boton-secundario" onClick={() => setEvaluando(null)}>
+                    Volver
+                </button>
+            </div>
+        </div>
+    );
 
-        return items;
-    };
+    const acciones = (solicitud) => (
+        <div className="acciones-tabla">
+            {solicitud.transiciones.map((destino) => (
+                <button
+                    key={destino}
+                    type="button"
+                    className={`boton boton-mini${['Cancelada', 'Rechazada'].includes(destino) ? ' boton-secundario' : ''}`}
+                    onClick={() => aplicar(solicitud, destino)}
+                    aria-label={`${etiqueta(solicitud, destino)}: solicitud de ${solicitud.clienteNombre} por ${solicitud.propiedadTitulo}`}
+                >
+                    {etiqueta(solicitud, destino)}
+                </button>
+            ))}
+            {user.rol === 'admin' && (
+                <button type="button" className="boton boton-mini boton-peligro" onClick={() => eliminarSolicitud(solicitud)}>
+                    Eliminar
+                </button>
+            )}
+        </div>
+    );
+
+    /** Estado, con el plazo del dueño cuando corresponde. */
+    const estado = (solicitud) => (
+        <>
+            <span className={`badge ${CLASES_BADGE[solicitud.estado] || 'disponible'}`}>{solicitud.estado}</span>
+            {solicitud.estado === 'Esperando propietario' && solicitud.venceEn && (
+                <div className="subtexto-tabla">Respuesta del dueño antes del {fecha(solicitud.venceEn)}</div>
+            )}
+            {solicitud.estado === 'Vencida' && esCliente && (
+                <div className="subtexto-tabla">El dueño no respondió a tiempo: puedes reactivarla.</div>
+            )}
+        </>
+    );
+
+    /** Recomendación del ejecutivo, respuesta del dueño y notas internas. */
+    const motivos = (solicitud) => (
+        <>
+            {solicitud.motivo || '—'}
+            {solicitud.motivoPropietario && <div className="subtexto-tabla">Dueño: {solicitud.motivoPropietario}</div>}
+            {interno && solicitud.observacionesEjecutivo && (
+                <div className="subtexto-tabla">Notas: {solicitud.observacionesEjecutivo}</div>
+            )}
+        </>
+    );
 
     return (
         <main className="seccion dashboard-main">
             <section className="dashboard-header">
-                <p className="etiqueta">ARRIENDOS</p>
-                <h1>Solicitudes de arriendo</h1>
+                <p className="etiqueta">{esCliente ? 'MIS SOLICITUDES' : 'ARRIENDOS'}</p>
+                <h1>{esCliente ? 'Mis solicitudes de arriendo' : 'Solicitudes de arriendo'}</h1>
                 <p className="subtitulo-login">
-                    Evalúa antecedentes, aprueba (reserva la propiedad), rechaza o libera reservas.
+                    {interno
+                        ? 'Evalúa los antecedentes de tu cartera: al aprobar, la solicitud pasa al propietario, que tiene 5 días hábiles para responder.'
+                        : esPropietario
+                            ? 'Solicitudes que el ejecutivo ya aprobó para tus propiedades. Al aceptar una, la propiedad queda reservada.'
+                            : 'Sigue el estado de tus postulaciones. Primero las evalúa el ejecutivo y después el propietario.'}
                 </p>
-                <AvisoFicticio texto="Las reservas y solicitudes aprobadas son ficticias: existen solo para demostrar el flujo de evaluación del caso." />
+                {esCliente && (
+                    <div className="acciones-detalle">
+                        <Link to="/propiedades" className="boton boton-ver">Buscar propiedades</Link>
+                    </div>
+                )}
             </section>
 
             {mensaje.texto && (
-                <p
-                    className={`mensaje ${mensaje.tipo === 'error' ? 'error' : ''} visible`}
-                    role={mensaje.tipo === 'error' ? 'alert' : 'status'}
-                >
+                <p className={`mensaje ${mensaje.tipo === 'error' ? 'error' : ''} visible`} role={mensaje.tipo === 'error' ? 'alert' : 'status'}>
                     {mensaje.texto}
                 </p>
             )}
@@ -239,40 +198,33 @@ export default function Arriendos() {
                 <div className="bar-filtros">
                     <div className="grupo-filtro">
                         <label htmlFor="filtro-estado-arriendo">Estado</label>
-                        <select
-                            id="filtro-estado-arriendo"
-                            value={filtroEstado}
-                            onChange={(event) => setFiltroEstado(event.target.value)}
-                        >
+                        <select id="filtro-estado-arriendo" value={filtroEstado} onChange={(e) => setFiltroEstado(e.target.value)}>
                             <option value="">Todos</option>
-                            {ESTADOS_ARRIENDO.map((estado) => (
-                                <option key={estado} value={estado}>
-                                    {estado}
-                                </option>
+                            {ESTADOS_ARRIENDO.map((item) => (
+                                <option key={item} value={item}>{item}</option>
                             ))}
                         </select>
-                    </div>
-                    <div className="grupo-filtro">
-                        <Link to="/arriendos/nueva" className="boton boton-filtrar">
-                            Nueva solicitud
-                        </Link>
                     </div>
                 </div>
             </section>
 
             <section className="table-panel">
                 <h2>Listado de solicitudes</h2>
-                {solicitudes.length ? (
+                {cargando && !arriendos.length ? (
+                    <p role="status">Cargando solicitudes...</p>
+                ) : error ? (
+                    <p className="mensaje error visible" role="alert">{error}</p>
+                ) : solicitudes.length ? (
                     <div className="tabla-wrap">
                         <table aria-label="Solicitudes de arriendo">
                             <thead>
                                 <tr>
                                     <th scope="col">Propiedad</th>
-                                    <th scope="col">Cliente</th>
-                                    <th scope="col">Ingreso mensual</th>
-                                    <th scope="col">Garantía</th>
+                                    {!esCliente && <th scope="col">Postulante</th>}
+                                    {!esPropietario && <th scope="col">Antecedentes</th>}
+                                    <th scope="col">Enviada</th>
                                     <th scope="col">Estado</th>
-                                    <th scope="col">Observaciones</th>
+                                    <th scope="col">Motivo</th>
                                     <th scope="col">Acciones</th>
                                 </tr>
                             </thead>
@@ -280,105 +232,32 @@ export default function Arriendos() {
                                 {solicitudes.map((solicitud) => (
                                     <tr key={solicitud.id}>
                                         <th scope="row">
-                                            <Link
-                                                to={`/propiedades/${solicitud.propiedadId}`}
-                                                className="link-detalle"
-                                            >
+                                            <Link to={`/propiedades/${solicitud.propiedadId}`} className="link-detalle">
                                                 {solicitud.propiedadTitulo}
                                             </Link>
                                         </th>
-                                        <td>
-                                            {solicitud.clienteNombre}
-                                            <div className="subtexto-tabla">
-                                                {solicitud.clienteEmail}
-                                            </div>
-                                            <div className="subtexto-tabla">
-                                                {solicitud.clienteTelefono}
-                                            </div>
-                                        </td>
-                                        <td>
-                                            ${Number(solicitud.ingresoMensual).toLocaleString('es-CL')}
-                                            <div className="subtexto-tabla">
-                                                {solicitud.antecedentes}
-                                            </div>
-                                        </td>
-                                        <td>{solicitud.garantia}</td>
-                                        <td>
-                                            <span
-                                                className={`badge ${
-                                                    CLASES_BADGE[solicitud.estado] || 'disponible'
-                                                }`}
-                                            >
-                                                {solicitud.estado}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            {editandoId === solicitud.id ? (
-                                                <div className="edicion-visita">
-                                                    <label
-                                                        className="visually-hidden"
-                                                        htmlFor={`obs-${solicitud.id}`}
-                                                    >
-                                                        Observaciones
-                                                    </label>
-                                                    <input
-                                                        type="text"
-                                                        id={`obs-${solicitud.id}`}
-                                                        placeholder="Observaciones del evaluador"
-                                                        value={formEvaluacion.observaciones}
-                                                        onChange={(event) =>
-                                                            setFormEvaluacion((prev) => ({
-                                                                ...prev,
-                                                                observaciones: event.target.value
-                                                            }))
-                                                        }
-                                                    />
-                                                    <label
-                                                        className="visually-hidden"
-                                                        htmlFor={`motivo-${solicitud.id}`}
-                                                    >
-                                                        Motivo
-                                                    </label>
-                                                    <select
-                                                        id={`motivo-${solicitud.id}`}
-                                                        value={formEvaluacion.motivo}
-                                                        onChange={(event) =>
-                                                            setFormEvaluacion((prev) => ({
-                                                                ...prev,
-                                                                motivo: event.target.value
-                                                            }))
-                                                        }
-                                                    >
-                                                        {MOTIVOS_ARRIENDO.map((motivo) => (
-                                                            <option key={motivo} value={motivo}>
-                                                                {motivo || 'Sin motivo'}
-                                                            </option>
-                                                        ))}
-                                                    </select>
-                                                    <div className="acciones-tabla">
-                                                        <button
-                                                            type="button"
-                                                            className="boton boton-mini boton-secundario"
-                                                            onClick={cancelarEvaluacion}
-                                                        >
-                                                            Cerrar
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            ) : (
-                                                <>
-                                                    {solicitud.observacionesEjecutivo || '—'}
-                                                    {solicitud.motivo ? (
-                                                        <div className="subtexto-tabla">
-                                                            Motivo: {solicitud.motivo}
-                                                        </div>
-                                                    ) : null}
-                                                </>
-                                            )}
-                                        </td>
-                                        <td>
-                                            <div className="acciones-tabla">{acciones(solicitud)}</div>
-                                        </td>
+                                        {!esCliente && (
+                                            <td>
+                                                {solicitud.clienteNombre}
+                                                {interno && (
+                                                    <>
+                                                        <div className="subtexto-tabla">{solicitud.clienteEmail}</div>
+                                                        <div className="subtexto-tabla">{solicitud.clienteTelefono}</div>
+                                                    </>
+                                                )}
+                                            </td>
+                                        )}
+                                        {!esPropietario && (
+                                            <td>
+                                                {pesos(solicitud.ingresoMensual)} / mes
+                                                <div className="subtexto-tabla">Garantía: {solicitud.garantia || 'Sin indicar'}</div>
+                                                {solicitud.antecedentes && <div className="subtexto-tabla">{solicitud.antecedentes}</div>}
+                                            </td>
+                                        )}
+                                        <td>{fecha(solicitud.createdAt)}</td>
+                                        <td>{estado(solicitud)}</td>
+                                        <td>{motivos(solicitud)}</td>
+                                        <td>{evaluando?.id === solicitud.id ? formularioEvaluacion(solicitud) : acciones(solicitud)}</td>
                                     </tr>
                                 ))}
                             </tbody>
@@ -386,7 +265,8 @@ export default function Arriendos() {
                     </div>
                 ) : (
                     <p className="mensaje sin-resultados visible" role="status">
-                        No hay solicitudes de arriendo con este filtro.
+                        No hay solicitudes con este filtro.
+                        {esCliente && ' Puedes postular desde el detalle de una propiedad publicada.'}
                     </p>
                 )}
             </section>

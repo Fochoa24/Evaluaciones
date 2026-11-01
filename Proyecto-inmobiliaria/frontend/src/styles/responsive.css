@@ -122,11 +122,6 @@
         padding: 10px 8px;
     }
 
-    .aviso-ficticio {
-        font-size: 0.9rem;
-        padding: 10px 12px;
-    }
-
     .dashboard-header .acciones-detalle .boton {
         flex: 1 1 auto;
         min-width: 140px;

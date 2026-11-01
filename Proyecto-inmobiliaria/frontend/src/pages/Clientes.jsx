@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import AvisoFicticio from '../components/AvisoFicticio';
 import { useArriendos } from '../context/ArriendosContext';
 import { useVisitas } from '../context/VisitasContext';
 
@@ -10,6 +9,11 @@ function construirClientes(interesadosVisitas, interesadosArriendos) {
     interesadosVisitas.forEach((visita) => {
         const clave = (visita.email || '').toLowerCase();
         if (!clave) return;
+        const existente = mapa.get(clave);
+        if (existente) {
+            existente.visitas += 1;
+            return;
+        }
         mapa.set(clave, {
             clave,
             nombre: visita.nombre,
@@ -17,7 +21,7 @@ function construirClientes(interesadosVisitas, interesadosArriendos) {
             telefono: visita.telefono || '',
             visitas: 1,
             solicitudes: 0,
-            ultimaActividad: visita.fecha || visita.creadaEn
+            ultimaActividad: visita.fecha
         });
     });
 
@@ -27,7 +31,7 @@ function construirClientes(interesadosVisitas, interesadosArriendos) {
         const existente = mapa.get(clave);
         if (existente) {
             existente.solicitudes += 1;
-            existente.ultimaActividad = arriendo.creadaEn;
+            existente.ultimaActividad = arriendo.createdAt;
             if (!existente.telefono) existente.telefono = arriendo.clienteTelefono || '';
         } else {
             mapa.set(clave, {
@@ -37,7 +41,7 @@ function construirClientes(interesadosVisitas, interesadosArriendos) {
                 telefono: arriendo.clienteTelefono || '',
                 visitas: 0,
                 solicitudes: 1,
-                ultimaActividad: arriendo.creadaEn
+                ultimaActividad: arriendo.createdAt
             });
         }
     });
@@ -74,7 +78,6 @@ export default function Clientes() {
                 <p className="subtitulo-login">
                     Personas que han solicitado visitas o arriendos, reunidas en una sola lista.
                 </p>
-                <AvisoFicticio texto="Los contactos listados se generan a partir de visitas y solicitudes ficticias de la demostración." />
             </section>
 
             <section className="contenedor-filtros" aria-label="Buscar clientes">
