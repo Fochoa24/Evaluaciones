@@ -39,6 +39,8 @@ export default function DetallePropiedad() {
     const publicada = propiedad?.estado === 'Publicada';
     // RN-01 y plazos: rango de fechas y bloques libres del día, desde la API.
     const [agenda, setAgenda] = useState({ desde: '', hasta: '', bloques: [], cargando: false });
+    // Última fecha pedida: descarta respuestas atrasadas de fechas anteriores.
+    const fechaPedida = useRef('');
     // Aviso que deja PropiedadEditar al volver (p. ej. "vuelve a revisión").
     const [aviso, setAviso] = useState(() => location.state?.aviso || { texto: '', tipo: 'success' });
 
@@ -59,9 +61,15 @@ export default function DetallePropiedad() {
 
     /** Al elegir fecha, pide los bloques libres de ese día. */
     const cargarBloques = async (fecha) => {
-        setAgenda((prev) => ({ ...prev, bloques: [], cargando: Boolean(fecha) }));
-        if (!fecha) return;
+        fechaPedida.current = fecha;
+        // Al escribir la fecha a mano cada dígito da una fecha distinta (0002-…, 0020-…):
+        // solo se consultan las que están dentro del rango agendable.
+        const enRango = fecha && (!agenda.desde || fecha >= agenda.desde) && (!agenda.hasta || fecha <= agenda.hasta);
+        setAgenda((prev) => ({ ...prev, bloques: [], cargando: Boolean(enRango) }));
+        if (!enRango) return;
         const r = await horarios(id, fecha);
+        // Una respuesta atrasada cambiaría las opciones con el select abierto y lo cerraría.
+        if (fechaPedida.current !== fecha) return;
         setAgenda((prev) => ({ ...prev, bloques: r.ok ? r.datos.bloques : [], cargando: false }));
     };
 
