@@ -122,7 +122,9 @@ export default function DetallePropiedad() {
     const focoPrimerError = (errores) => {
         const primero = Object.keys(errores)[0];
         if (!primero || !formRef.current) return;
-        const campo = formRef.current.elements.namedItem(primero);
+        let campo = formRef.current.elements.namedItem(primero);
+        // Los horarios son radios: namedItem devuelve la lista; se enfoca el primero.
+        if (campo instanceof RadioNodeList) campo = campo[0];
         if (campo && typeof campo.focus === 'function') {
             campo.focus();
         }
@@ -397,25 +399,30 @@ export default function DetallePropiedad() {
                         )}
                     </div>
 
-                    <div className="campo">
-                        <label htmlFor="hora-visita">Hora</label>
-                        <select
-                            id="hora-visita"
-                            name="hora"
-                            value={solicitud.hora}
-                            onChange={handleChange}
-                            required
-                            disabled={!agenda.bloques.length}
-                            aria-invalid={erroresCampo.hora ? 'true' : undefined}
-                            aria-describedby={erroresCampo.hora ? 'hora-visita-error' : 'hora-visita-ayuda'}
-                        >
-                            <option value="">
-                                {agenda.cargando ? 'Buscando horarios...' : 'Elige un horario'}
-                            </option>
-                            {agenda.bloques.map((hora) => (
-                                <option key={hora} value={hora}>{hora}</option>
-                            ))}
-                        </select>
+                    {/* Botones y no <select>: en Firefox sobre Wayland el desplegable nativo
+                        se cerraba solo o se cortaba sin scroll antes del último bloque. */}
+                    <fieldset
+                        className="campo campo-completo campo-horas"
+                        aria-invalid={erroresCampo.hora ? 'true' : undefined}
+                        aria-describedby={erroresCampo.hora ? 'hora-visita-error' : 'hora-visita-ayuda'}
+                    >
+                        <legend>Hora</legend>
+                        {agenda.bloques.length > 0 && (
+                            <div className="horas-visita">
+                                {agenda.bloques.map((hora) => (
+                                    <label key={hora} className="hora-opcion">
+                                        <input
+                                            type="radio"
+                                            name="hora"
+                                            value={hora}
+                                            checked={solicitud.hora === hora}
+                                            onChange={handleChange}
+                                        />
+                                        <span>{hora}</span>
+                                    </label>
+                                ))}
+                            </div>
+                        )}
                         {erroresCampo.hora ? (
                             <span id="hora-visita-error" className="error-campo">
                                 {erroresCampo.hora}
@@ -424,12 +431,14 @@ export default function DetallePropiedad() {
                             <small id="hora-visita-ayuda" aria-live="polite">
                                 {!solicitud.fecha
                                     ? 'Primero elige una fecha.'
-                                    : !agenda.cargando && !agenda.bloques.length
-                                        ? 'No hay horarios libres ese día (fin de semana, feriado o agenda completa).'
-                                        : ''}
+                                    : agenda.cargando
+                                        ? 'Buscando horarios...'
+                                        : !agenda.bloques.length
+                                            ? 'No hay horarios libres ese día (fin de semana, feriado o agenda completa).'
+                                            : ''}
                             </small>
                         )}
-                    </div>
+                    </fieldset>
 
                     <div className="campo campo-completo">
                         <label htmlFor="comentarios-visita">Comentarios (opcional)</label>
