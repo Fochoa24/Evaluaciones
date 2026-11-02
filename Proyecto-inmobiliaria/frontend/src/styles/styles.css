@@ -1427,6 +1427,63 @@ body {
     font-weight: bold;
 }
 
+/* Horarios de visita como botones (radios) en lugar de un <select>. */
+.campo-horas {
+    border: 0;
+    margin: 0;
+    min-width: 0;
+    padding: 0;
+}
+
+.campo-horas legend {
+    color: var(--texto);
+    font-size: 0.9rem;
+    font-weight: bold;
+    margin-bottom: 8px;
+    padding: 0;
+}
+
+.horas-visita {
+    display: grid;
+    gap: 8px;
+    grid-template-columns: repeat(auto-fill, minmax(76px, 1fr));
+}
+
+.campo .hora-opcion {
+    cursor: pointer;
+    font-weight: 600;
+    position: relative;
+}
+
+.hora-opcion input {
+    opacity: 0;
+    position: absolute;
+}
+
+.hora-opcion span {
+    border: 1.5px solid #d0d7d5;
+    border-radius: 6px;
+    display: block;
+    padding: 10px 0;
+    text-align: center;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.hora-opcion:hover span {
+    border-color: var(--verde);
+}
+
+.hora-opcion input:checked + span {
+    background: var(--verde);
+    border-color: var(--verde);
+    color: var(--blanco);
+}
+
+.hora-opcion input:focus-visible + span {
+    outline: 2px solid var(--verde);
+    outline-offset: 2px;
+}
+
 .error-campo {
     color: #9a2d2d;
     font-size: 0.85rem;
